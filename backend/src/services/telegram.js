@@ -1,7 +1,17 @@
 const axios = require('axios');
+const fs = require('fs');
+const FormData = require('form-data');
 const { telegramBotToken, telegramChannelId, adminTelegramId } = require('../config');
 
-const apiBase = `https://api.telegram.org/bot${telegramBotToken}`;
+const hasTelegram = !!telegramBotToken;
+const apiBase = telegramBotToken ? `https://api.telegram.org/bot${telegramBotToken}` : null;
+
+function escapeHtml(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
 
 function buildText(ad) {
   const tags = [ad.category, ad.location]
@@ -9,16 +19,52 @@ function buildText(ad) {
     .map((value) => `#${String(value).toLowerCase().replace(/\s+/g, '_')}`)
     .join(' ');
 
-  const lines = [tags, ad.description.trim()];
-  lines.push(`Місто: ${ad.location}`);
+  const lines = [escapeHtml(tags), escapeHtml(ad.description ? ad.description.trim() : '')];
+  lines.push(`Місто: ${escapeHtml(ad.location || '')}`);
   if (ad.contacts) {
-    lines.push(`Контакт: ${ad.contacts}`);
+    lines.push(`Контакт: ${escapeHtml(ad.contacts)}`);
   }
 
   return lines.join('\n');
 }
 
-async function sendAdToChannel(ad) {
+async function sendAdToChannel(ad, photoBuffer = null, photoFileName = 'photo.jpg') {
+  if (!hasTelegram) {
+    console.warn('TELEGRAM_BOT_TOKEN not configured — skipping real send. Returning fake message id.');
+    return Date.now();
+  }
+
+  if (photoBuffer) {
+    const form = new FormData();
+    form.append('chat_id', telegramChannelId);
+    form.append('caption', buildText(ad));
+    form.append('parse_mode', 'HTML');
+    form.append('photo', photoBuffer, {
+      filename: photoFileName,
+      contentType: photoFileName.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg'
+    });
+
+    const response = await axios.post(`${apiBase}/sendPhoto`, form, {
+      headers: form.getHeaders()
+    });
+    return response.data.result.message_id;
+  }
+
+  if (ad.img && ad.img.startsWith('file://')) {
+    const filePath = ad.img.replace('file://', '');
+    const stream = fs.createReadStream(filePath);
+    const form = new FormData();
+    form.append('chat_id', telegramChannelId);
+    form.append('caption', buildText(ad));
+    form.append('parse_mode', 'HTML');
+    form.append('photo', stream);
+
+    const response = await axios.post(`${apiBase}/sendPhoto`, form, {
+      headers: form.getHeaders()
+    });
+    return response.data.result.message_id;
+  }
+
   if (ad.img) {
     const response = await axios.post(`${apiBase}/sendPhoto`, {
       chat_id: telegramChannelId,
@@ -39,14 +85,33 @@ async function sendAdToChannel(ad) {
 
 async function deleteMessageFromChannel(messageId) {
   if (!messageId) return;
-  await axios.post(`${apiBase}/deleteMessage`, {
-    chat_id: telegramChannelId,
-    message_id: messageId
-  });
+  if (!hasTelegram) {
+    console.warn('TELEGRAM_BOT_TOKEN not configured — skipping deleteMessage');
+    return;
+  }
+
+  try {
+    await axios.post(`${apiBase}/deleteMessage`, {
+      chat_id: telegramChannelId,
+      message_id: messageId
+    });
+  } catch (error) {
+    const description = error?.response?.data?.description || error?.message || '';
+    const isIgnored = error?.response?.status === 400 && /message.*(not found|can'?t be deleted|identifier is not specified|chat not found|was deleted)/i.test(description);
+    if (isIgnored) {
+      console.warn('deleteMessageFromChannel: non-fatal Telegram delete error:', description);
+      return;
+    }
+    throw error;
+  }
 }
 
 async function notifyAdmin(text) {
   if (!adminTelegramId) return;
+  if (!hasTelegram) {
+    console.warn('notifyAdmin: telegram not configured —', text);
+    return;
+  }
   try {
     await axios.post(`${apiBase}/sendMessage`, {
       chat_id: adminTelegramId,

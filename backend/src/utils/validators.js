@@ -35,6 +35,16 @@ function validateLocation(location) {
   return typeof location === 'string' && (LOCATIONS.includes(location) || location.trim().length > 0);
 }
 
+function validateContact(contact) {
+  if (typeof contact !== 'string' || !contact.trim()) return false;
+  const trimmed = contact.trim();
+  if (trimmed.length > 64) return false;
+  const phone = trimmed.replace(/[^+\d]/g, '');
+  const isPhone = /^\+?\d{7,15}$/.test(phone);
+  const isUsername = /^@?[A-Za-z0-9_]{3,32}$/.test(trimmed);
+  return isPhone || isUsername;
+}
+
 function normalizeContact(contact) {
   if (!contact) {
     return null;
@@ -49,5 +59,6 @@ module.exports = {
   validateDescription,
   validateCategory,
   validateLocation,
+  validateContact,
   normalizeContact
 };

@@ -11,13 +11,31 @@ async function removeExpiredAds() {
     }
 
     for (const ad of expiredAds) {
+      // Delete telegram message — non-fatal
       try {
         await deleteMessageFromChannel(ad.telegram_message_id);
+      } catch (err) {
+        const details = err?.response?.data?.description || err?.message || String(err);
+        console.warn('deleteMessageFromChannel failed (non-fatal) for ad', ad.id, details);
+        await notifyAdmin(`Warning: failed to delete telegram message for ad id=${ad.id}: ${details}`);
+      }
+
+      // Delete stored photo — non-fatal
+      try {
         await deletePhoto(ad.img);
+      } catch (err) {
+        const details = err?.response?.data?.message || err?.message || String(err);
+        console.warn('deletePhoto failed (non-fatal) for ad', ad.id, details);
+        await notifyAdmin(`Warning: failed to delete photo for ad id=${ad.id}: ${details}`);
+      }
+
+      // Finally, remove ad record from DB — report if this fails
+      try {
         await deleteAd(ad.id);
-      } catch (error) {
-        console.error('Failed to remove expired ad', ad.id, error.message);
-        await notifyAdmin(`Failed to remove expired ad id=${ad.id}: ${error.message}`);
+      } catch (err) {
+        const details = err?.response?.data?.message || err?.message || String(err);
+        console.error('Failed to delete ad record', ad.id, details);
+        await notifyAdmin(`Failed to remove expired ad id=${ad.id}: ${details}`);
       }
     }
   } catch (error) {

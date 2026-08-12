@@ -1,146 +1,770 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import CreateAd from './CreateAd.jsx';
-
+import styles from './App.module.css';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
-const categories = ['Транспорт', 'Послуги', 'Робота', 'Нерухомість', 'Товари інше', 'Будівництво', 'Сільгосп', 'Електроніка', 'Меблі', 'Одяг/Взуття'];
-const locations = ['Магдалинівка', 'Спаське', 'Підгороднє', 'Котовка'];
+const DEFAULT_CARD_IMAGE = '/assets/mag-obyava-banner.jpg';
 
-function AdCard({ ad }) {
+const defaultAds = [
+  {
+    id: "1",
+    category: "Транспорт",
+    location: "Магдалинівка",
+    title: "Терміново продам BMW M2",
+    description: "Чудовий автомобіль, один власник, повний привід, пробіг 78 000 км. У гарному стані, готовий до довгих поїздок.",
+    contacts: "@mag_obyava_bot",
+    img: "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: "2",
+    category: "Нерухомість",
+    location: "Спаське",
+    title: "Простора 3-кімнатна квартира",
+    description: "Світла квартира на другому поверсі з ремонтом, поруч школа, дитячий майданчик та магазини. Чудовий варіант для сім’ї.",
+    contacts: "099 5453 899",
+    img: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: "3",
+    category: "Електроніка",
+    location: "Підгородне",
+    title: "Новий смартфон в упаковці",
+    description: "Сучасний смартфон із потужним процесором та великим екраном. Повністю новий, у заводській упаковці, гарантія виробника.",
+    contacts: "@username123",
+    img: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: "4",
+    category: "Будівництво",
+    location: "Котовка",
+    title: "Продам будівельні матеріали",
+    description: "Якісні матеріали для ремонту та будівництва: плитка, фарба, гіпсокартон та дерево. Є доставка до об’єкта.",
+    contacts: "067 123 45 67",
+    img: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: "5",
+    category: "Транспорт",
+    location: "Магдалинівка",
+    title: "Вантажний фургон для бізнесу",
+    description: "Зручний фургон із великим вантажним відсіком, ідеальний для перевезення товарів та вантажів. Низьке споживання пального та комфортний салон.",
+    contacts: "095 765 43 21",
+    img: "https://images.unsplash.com/photo-1516455207990-7a41ce80f7ee?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: "6",
+    category: "Робота",
+    location: "Спаське",
+    title: "Шукаємо кур'єра на неповний робочий день",
+    description: "Потрібен кур’єр для доставки замовлень. Графік гнучкий, робота по району, оплата погодинна та бонуси за швидкість.",
+    contacts: "@job_offers",
+    img: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: "7",
+    category: "Товари інше",
+    location: "Підгородне",
+    title: "Якісні меблі для дому",
+    description: "Шафи, комоди та столи з натурального дерева. Міцні вироби із сучасним дизайном, підходять для вітальні та спальні.",
+    contacts: "067 888 99 00",
+    img: "https://images.unsplash.com/photo-1493666438817-866a91353ca9?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: "8",
+    category: "Сільгосп",
+    location: "Котовка",
+    title: "Насіння та добрива оптом",
+    description: "Насіння овочевих та зернових культур, а також мінеральні добрива для великих посівних площ. Доставка за домовленістю.",
+    contacts: "@agro_supply",
+    img: "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: "9",
+    category: "Меблі",
+    location: "Магдалинівка",
+    title: "Шикарний гарнітур для вітальні",
+    description: "Повний комплект меблів для вітальні: диван, крісла, журнальний столик та шафа. Стильний дизайн, відмінний стан, практично як новий.",
+    contacts: "099 333 22 11",
+    img: "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: "10",
+    category: "Одяг/Взуття",
+    location: "Спаське",
+    title: "Нова куртка та черевики",
+    description: "Стильна куртка та шкіряні черевики одного розміру. Чудовий комплект для осіннього сезону, теплий та зручний.",
+    contacts: "@style_shop",
+    img: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: "11",
+    category: "Послуги",
+    location: "Підгородне",
+    title: "Ремонт кухонь під ключ",
+    description: "Професійний ремонт кухонь із підбором матеріалів та встановленням меблів. Робота виконується вчасно, гарантія якості та чистота на об’єкті.",
+    contacts: "063 777 66 55",
+    img: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: "12",
+    category: "Транспорт",
+    location: "Котовка",
+    title: "Електросамокат в ідеалі",
+    description: "Сучасний електросамокат із потужним мотором та комфортною підвіскою. У чудовому стані, акумулятор тримає заряд до 30 км.",
+    contacts: "095 111 22 33",
+    img: "https://images.unsplash.com/photo-1504215680853-026ed2a45def?auto=format&fit=crop&w=800&q=80"
+  }
+];
+
+function getWordSnippet(text, wordLimit = 10) {
+  if (typeof text !== 'string') return '';
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  return words.slice(0, wordLimit).join(' ');
+}
+
+function getContactLink(contact) {
+  if (!contact || typeof contact !== 'string') return null;
+  const trimmed = contact.trim();
+  if (trimmed.startsWith('@')) {
+    const username = trimmed.slice(1);
+    return `https://t.me/${username}`;
+  }
+  if (/^\+?\d[\d\s()-]{4,}$/.test(trimmed)) {
+    return `tel:${trimmed.replace(/[^+\d]/g, '')}`;
+  }
+  try {
+    const url = new URL(trimmed);
+    return url.href;
+  } catch {
+    return `https://${trimmed}`;
+  }
+}
+
+function parseContactInfo(contact) {
+  const result = { telegram: null, phone: null };
+  if (!contact || typeof contact !== 'string') return result;
+
+  const trimmed = contact.trim();
+  const lower = trimmed.toLowerCase();
+
+  // Telegram link from explicit @username or t.me/... URL
+  const telegramUrlMatch = trimmed.match(/(?:https?:\/\/)?(?:t\.me|telegram\.me)\/(?<name>[a-zA-Z0-9_]{5,32})/i);
+  if (telegramUrlMatch?.groups?.name) {
+    result.telegram = `https://t.me/${telegramUrlMatch.groups.name}`;
+  } else {
+    const atMatch = trimmed.match(/@([a-zA-Z0-9_]{5,32})/);
+    if (atMatch?.[1]) {
+      result.telegram = `https://t.me/${atMatch[1]}`;
+    } else if (/^[a-zA-Z0-9_]{5,32}$/.test(trimmed) && !/^\+?\d[\d\s()\-]{4,}$/.test(trimmed)) {
+      result.telegram = `https://t.me/${trimmed}`;
+    }
+  }
+
+  const phoneMatch = trimmed.match(/(\+?\d[\d\s()\-]{4,}\d)/);
+  if (phoneMatch?.[1]) {
+    const cleaned = phoneMatch[1].replace(/[^+\d]/g, '');
+    if (/^\+?\d{7,15}$/.test(cleaned)) {
+      result.phone = `tel:${cleaned}`;
+    }
+  }
+
+  // If phone not found and contact is all digits with optional punctuation
+  if (!result.phone) {
+    const onlyDigits = trimmed.replace(/[^+\d]/g, '');
+    if (/^\+?\d{7,15}$/.test(onlyDigits)) {
+      result.phone = `tel:${onlyDigits}`;
+    }
+  }
+
+  return result;
+}
+
+function normalizeAd(ad) {
+  if (!ad || typeof ad !== 'object') return null;
+  return {
+    ...ad,
+    id: String(ad.id ?? Date.now()),
+    title: ad.title || ad.description || '',
+    description: ad.description || ad.title || '',
+    contacts: ad.contacts || ad.contact || '',
+    username: ad.username || null,
+    category: ad.category || 'Інше',
+    location: ad.location || 'Невідомо',
+    img: ad.img || DEFAULT_CARD_IMAGE
+  };
+}
+
+function AdCard({ ad, index, onClick }) {
+  const categoryTag = `#${((ad.category || '').split(' ')[0] || '').toLowerCase()}`;
+  const locationTag = '#' + (((ad.location || 'місто').split(' ')[0]) || 'місто').toLowerCase();
+  const cardStyle = {
+    '--border-delay': `${index * -2.2}s`,
+    animationDelay: `${index * -2.2}s`
+  };
+  const cardText = getWordSnippet(ad.description || ad.title || '', 10) || 'Немає опису оголошення';
+
   return (
-    <article className="card">
-      <div className="card-meta">
-        <span className="tag">#{ad.category.toLowerCase().replace(/\s+/g, '_')}</span>
-        <span className="tag">#{ad.location.toLowerCase().replace(/\s+/g, '_')}</span>
+    <article className={styles.card} style={{ ...cardStyle, cursor: 'pointer' }} onClick={onClick}>
+      <div className={styles.cardImage} style={{ backgroundImage: `url(${ad.img || DEFAULT_CARD_IMAGE})` }}>
+        <div className={styles.cardTags}>
+          <span className={`${styles.cardTag} ${styles.purple}`}>{categoryTag}</span>
+          <span className={`${styles.cardTag} ${styles.blue}`}>{locationTag}</span>
+        </div>
       </div>
-      {ad.img ? <img className="card-image" src={ad.img} alt="ad" /> : null}
-      <p className="card-text">{ad.description}</p>
-      <div className="card-footer">
-        <span>{ad.contacts || 'Контакт не вказано'}</span>
-        <span>{new Date(ad.created_at).toLocaleDateString('uk-UA')}</span>
+      <div className={styles.cardBody}>
+        <div className={styles.cardTitle}>{cardText}</div>
+        <div className={styles.cardInfo}>
+          Місто: {ad.location}
+          <br />
+          Контакт: {ad.contacts}
+        </div>
       </div>
     </article>
   );
 }
 
-function App() {
-  const [ads, setAds] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [category, setCategory] = useState('');
-  const [location, setLocation] = useState('');
-  const [error, setError] = useState(null);
+export default function App() {
+  const categories = ['Транспорт','Послуги','Робота','Нерухомість','Товари інше','Будівництво','Сільгосп','Електроніка','Меблі','Одяг/Взуття'];
+  const locations = ['Магдалинівка','Спаське','Підгородне','Котовка'];
 
-  useEffect(() => {
-    async function load() {
-      setLoading(true);
-      setError(null);
-      try {
-        const query = new URLSearchParams();
-        if (category) query.set('category', category);
-        if (location) query.set('location', location);
-        const response = await fetch(`${API_BASE}/api/ads?${query.toString()}`);
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Не удалось загрузить объявления');
-        setAds(data.ads || []);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
-  }, [category, location]);
+  function getBrowserFallbackUser() {
+    if (typeof window === 'undefined') return null;
 
-  const [showCreate, setShowCreate] = useState(false);
-  const [statusMessage, setStatusMessage] = useState(null);
-
-  async function handleCreateSubmit(formData) {
-    setStatusMessage({ type: 'info', text: 'Отправка объявления...' });
     try {
-      const fd = new FormData();
-      fd.append('telegram_id', formData.telegram_id || '');
-      fd.append('username', formData.username || '');
-      fd.append('category', formData.category);
-      fd.append('location', formData.location);
-      fd.append('description', formData.description);
-      fd.append('contacts', formData.contacts || '');
-      fd.append('is_paid', formData.is_paid ? 'true' : 'false');
-      if (formData.photo) fd.append('photo', formData.photo, formData.photo.name);
+      const saved = window.localStorage.getItem('mag-obyava-browser-user');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed?.id) return parsed;
+      }
+    } catch {}
 
-      const res = await fetch(`${API_BASE}/api/ads`, {
-        method: 'POST',
-        body: fd
+    const fallbackId = Number(String(Date.now()).slice(-9));
+    const fallbackUser = { id: fallbackId, username: `browser${fallbackId}` };
+
+    try {
+      window.localStorage.setItem('mag-obyava-browser-user', JSON.stringify(fallbackUser));
+    } catch {}
+
+    return fallbackUser;
+  }
+
+  function getEffectiveTelegramUser() {
+    const url = new URL(window.location.href);
+    const mockTg = url.searchParams.get('mock_tg') === '1';
+    const mockUsername = url.searchParams.get('mock_tg_username') || null;
+    const mockUserId = url.searchParams.get('mock_tg_user_id') || null;
+
+    if (mockTg) {
+      return { id: mockUserId || '123456', username: mockUsername || 'mockuser' };
+    }
+
+    return typeof window !== 'undefined' && window.Telegram?.WebApp?.initDataUnsafe?.user
+      ? window.Telegram.WebApp.initDataUnsafe.user
+      : getBrowserFallbackUser();
+  }
+
+  async function loadCurrentUserInfo(tgUser) {
+    if (!tgUser?.id) {
+      setUserLoaded(true);
+      return;
+    }
+    const headers = { 'x-telegram-id': String(tgUser.id) };
+
+    try {
+      const res = await fetch(`${API_BASE}/api/me`, { headers });
+      const data = await res.json().catch(() => null);
+      const serverUser = data?.user || null;
+      setCurrentUser({
+        telegram_user_id: tgUser.id,
+        username: tgUser.username || serverUser?.username || null,
+        phone: serverUser?.phone || null,
+        free_ad_used: !!serverUser?.free_ad_used
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Ошибка при отправке');
-      setStatusMessage({ type: 'success', text: 'Оголошення опубліковано!' });
-      setShowCreate(false);
-      // optionally reload list
-      const response = await fetch(`${API_BASE}/api/ads`);
-      const newData = await response.json();
-      setAds(newData.ads || []);
-    } catch (err) {
-      setStatusMessage({ type: 'error', text: err.message || 'Ошибка' });
+    } catch (error) {
+      setCurrentUser({
+        telegram_user_id: tgUser.id,
+        username: tgUser.username || null,
+        phone: null,
+        free_ad_used: false
+      });
+    } finally {
+      setUserLoaded(true);
     }
   }
 
+  const [ads, setAds] = useState(defaultAds);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [userLoaded, setUserLoaded] = useState(false);
+  const [tgStatus, setTgStatus] = useState({ available: false, user: null });
+  const [loading, setLoading] = useState(false);
+  const [showSearchPanel, setShowSearchPanel] = useState(false);
+  const [showCategoryPicker, setShowCategoryPicker] = useState(false);
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedLocation, setSelectedLocation] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const categoryStripRef = useRef(null);
+  const categoryThumbRef = useRef(null);
+  const locationStripRef = useRef(null);
+  const locationThumbRef = useRef(null);
+  const [showCreate, setShowCreate] = useState(false);
+  const [selectedAd, setSelectedAd] = useState(null);
+  const [isModalClosing, setIsModalClosing] = useState(false);
+  const closeTimeoutRef = useRef(null);
+  const [statusMessage, setStatusMessage] = useState(null);
+  const [postedAdLink, setPostedAdLink] = useState(null);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const screenRef = useRef(null);
+  const [showPromo, setShowPromo] = useState(false);
+
+  function resetSearch() {
+    setSearchText('');
+    setSearchQuery('');
+    setSelectedCategory('');
+    setSelectedLocation('');
+    setShowSearchPanel(false);
+    setShowCategoryPicker(false);
+    setShowLocationPicker(false);
+  }
+
+  function getUserIdentity() {
+    if (!currentUser) return 'клієнт';
+    if (currentUser.username) return `@${currentUser.username.replace(/^@/, '')}`;
+    if (currentUser.phone) return currentUser.phone;
+    return currentUser.telegram_user_id ? String(currentUser.telegram_user_id) : 'клієнт';
+  }
+
+  function getPromoTitle() {
+    const identity = getUserIdentity();
+    if (currentUser?.free_ad_used) {
+      return `Шановний, ${identity}, ваш ліміт на безкоштовні оголошення вичерпано. Ви можете розмістити платне оголошення на 21 день.`;
+    }
+    return `Шановний, ${identity}, ви можете розмістити одне безкоштовне оголошення на 5 днів.`;
+  }
+
+  function handleAddClick() {
+    if (!userLoaded) {
+      setStatusMessage({ type: 'info', text: 'Зачекайте, іде перевірка користувача...' });
+      return;
+    }
+    setStatusMessage(null);
+    setShowPromo(true);
+  }
+
+  function handleClosePromo() {
+    setShowPromo(false);
+    setShowCreate(false);
+  }
+
+  function handleProceedCreate() {
+    setShowPromo(false);
+    setShowCreate(true);
+  }
+
+  useEffect(() => {
+    const strips = [
+      { strip: categoryStripRef.current, thumb: categoryThumbRef.current },
+      { strip: locationStripRef.current, thumb: locationThumbRef.current }
+    ].filter(({ strip, thumb }) => strip && thumb);
+
+    if (!strips.length) return;
+
+    let dragging = false;
+    let activeStrip = null;
+    let activeThumb = null;
+    let thumbStartX = 0;
+    let thumbStartLeft = 0;
+
+    const updateThumb = (strip, thumb) => {
+      const { scrollWidth, clientWidth, scrollLeft } = strip;
+      const ratio = clientWidth / scrollWidth;
+      const thumbWidth = Math.max(ratio * clientWidth, 40);
+      const maxLeft = clientWidth - thumbWidth;
+      const left = (scrollLeft / (scrollWidth - clientWidth)) * maxLeft || 0;
+      thumb.style.width = thumbWidth + 'px';
+      thumb.style.transform = `translateX(${left}px)`;
+    };
+
+    const onWindowResize = () => strips.forEach(({ strip, thumb }) => updateThumb(strip, thumb));
+
+    const onDocumentPointerMove = (e) => {
+      if (!dragging || !activeStrip || !activeThumb) return;
+      const dx = e.clientX - thumbStartX;
+      const { clientWidth, scrollWidth } = activeStrip;
+      const thumbWidth = Math.max((clientWidth / scrollWidth) * clientWidth, 40);
+      const maxLeft = clientWidth - thumbWidth;
+      const newLeft = Math.min(Math.max(thumbStartLeft + dx, 0), maxLeft);
+      activeStrip.scrollLeft = maxLeft > 0 ? (newLeft / maxLeft) * (scrollWidth - clientWidth) : 0;
+      updateThumb(activeStrip, activeThumb);
+    };
+
+    const onDocumentPointerUp = () => {
+      if (!dragging) return;
+      dragging = false;
+      if (activeThumb) activeThumb.style.transition = '';
+      document.body.style.userSelect = '';
+      activeStrip = null;
+      activeThumb = null;
+    };
+
+    const listeners = [];
+    strips.forEach(({ strip, thumb }) => {
+      const onStripScroll = () => updateThumb(strip, thumb);
+      const onThumbPointerDown = (e) => {
+        e.stopPropagation();
+        dragging = true;
+        activeStrip = strip;
+        activeThumb = thumb;
+        thumbStartX = e.clientX;
+        const m = (thumb.style.transform || '').match(/translateX\(([-0-9.]+)px\)/);
+        thumbStartLeft = m ? parseFloat(m[1]) : 0;
+        thumb.style.transition = 'none';
+        document.body.style.userSelect = 'none';
+        thumb.setPointerCapture?.(e.pointerId);
+      };
+
+      strip.addEventListener('scroll', onStripScroll, { passive: true });
+      thumb.addEventListener('pointerdown', onThumbPointerDown);
+      listeners.push({ strip, onStripScroll, thumb, onThumbPointerDown });
+      updateThumb(strip, thumb);
+    });
+
+    window.addEventListener('resize', onWindowResize);
+    window.addEventListener('pointermove', onDocumentPointerMove);
+    window.addEventListener('pointerup', onDocumentPointerUp);
+
+    return () => {
+      listeners.forEach(({ strip, onStripScroll, thumb, onThumbPointerDown }) => {
+        strip.removeEventListener('scroll', onStripScroll);
+        thumb.removeEventListener('pointerdown', onThumbPointerDown);
+      });
+      window.removeEventListener('resize', onWindowResize);
+      window.removeEventListener('pointermove', onDocumentPointerMove);
+      window.removeEventListener('pointerup', onDocumentPointerUp);
+    };
+  }, [showCategoryPicker, showLocationPicker]);
+
+  useEffect(() => {
+    const screenEl = screenRef.current;
+    if (!screenEl) return;
+    const onScroll = () => setIsScrolled(screenEl.scrollTop > 16);
+    screenEl.addEventListener('scroll', onScroll, { passive: true });
+    return () => screenEl.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const apiAds = (Array.isArray(ads) ? ads : []).filter((a) => String(a.id || '').startsWith('api-'));
+  const demoAds = defaultAds.map(normalizeAd).filter(Boolean);
+  const visibleAds = [...apiAds, ...demoAds].filter((a) => {
+    const q = searchQuery.toLowerCase().trim();
+    return !q || [a.title, a.description, a.category, a.location].some((f) => (f || '').toLowerCase().includes(q));
+  }).slice(0, 100);
+
+  const hasActiveSearch = Boolean(searchQuery.trim()) || Boolean(selectedCategory) || Boolean(selectedLocation);
+  const now = new Date();
+  const formattedDate = `${String(now.getDate()).padStart(2, '0')}.${String(now.getMonth() + 1).padStart(2, '0')}.${now.getFullYear()}`;
+  const headerInfoText = hasActiveSearch
+    ? `Знайдено: ${visibleAds.length}${visibleAds.length < ads.length ? ' на сьогоднi з ' + ads.length : ''}`
+    : `ТОП-${ads.length}`;
+  const headerInfoRightText = `Оголошення ${formattedDate}.`;
+
+  async function loadAds({ showSpinner = false } = {}) {
+    if (showSpinner) setLoading(true);
+    const tgUser = getEffectiveTelegramUser();
+
+    if (tgUser) {
+      setTgStatus({ available: true, user: tgUser });
+      await loadCurrentUserInfo(tgUser);
+    } else {
+      setCurrentUser(null);
+      setTgStatus({ available: false, user: null });
+    }
+
+    const headers = {};
+    if (tgUser?.id) headers['x-telegram-id'] = String(tgUser.id);
+
+    try {
+      const res = await fetch(`${API_BASE}/api/ads`, { headers });
+      const data = await res.json().catch(() => null);
+      if (res.ok) {
+        const serverAds = Array.isArray(data?.ads) ? data.ads : [];
+        const serverAdsNormalized = serverAds.map((ad) => ({ ...normalizeAd(ad), id: `api-${ad.id}` })).filter(Boolean);
+        setAds(serverAdsNormalized.length ? serverAdsNormalized : defaultAds);
+      } else {
+        setAds(defaultAds);
+      }
+    } catch (e) {
+      setAds(defaultAds);
+    } finally {
+      if (showSpinner) setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function init() {
+      if (!mounted) return;
+      await loadAds({ showSpinner: false });
+    }
+
+    function handleVisibilityChange() {
+      if (document.visibilityState === 'visible' && !loading) {
+        loadAds({ showSpinner: false });
+      }
+    }
+
+    init();
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      mounted = false;
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
+  async function handleCreateSubmit(formData) {
+    setStatusMessage({ type: 'info', text: 'Відправка оголошення...' });
+    setPostedAdLink(null);
+    setShowCreate(false);
+    try {
+      const fd = new FormData();
+      Object.keys(formData).forEach((k) => {
+        const value = formData[k];
+        if (value !== null && value !== undefined) fd.append(k, value);
+      });
+
+      const effectiveUser = getEffectiveTelegramUser();
+      if (effectiveUser?.id) {
+        setCurrentUser({
+          username: effectiveUser.username || null,
+          telegram_user_id: effectiveUser.id,
+          phone: null
+        });
+      }
+
+      const headers = {};
+      if (effectiveUser?.id) headers['x-telegram-id'] = String(effectiveUser.id);
+      
+      const res = await fetch(`${API_BASE}/api/ads`, { method: 'POST', headers, body: fd });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.error || 'Помилка публікації');
+      
+      const created = data?.ad;
+      const adId = created?.id || data?.ad_id;
+      const telegramLink = data?.telegram_link || null;
+
+      if (created) {
+        setAds((prevAds) => [{
+          id: String(created.id),
+          category: created.category || formData.category,
+          location: created.location || formData.location,
+          title: created.title || formData.description || '',
+          description: created.description || formData.description || '',
+          contacts: created.contacts || formData.contacts || '',
+          username: created.username || formData.username || null,
+          img: created.img || (formData.photo ? URL.createObjectURL(formData.photo) : 'https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=800&q=80')
+        }, ...prevAds]);
+      }
+      await loadAds();
+
+      setStatusMessage({
+        type: 'success',
+        text: 'Ваше оголошення опубліковано.'
+      });
+      setPostedAdLink(telegramLink || (adId ? `${window.location.origin}/?ad=${adId}` : null));
+    } catch (err) {
+      setStatusMessage({ type: 'error', text: 'Оголошення не опубліковано: ' + (err.message || 'Помилка') });
+    }
+  }
+
+  function closeModal() {
+    if (closeTimeoutRef.current) window.clearTimeout(closeTimeoutRef.current);
+    setIsModalClosing(true);
+    closeTimeoutRef.current = window.setTimeout(() => {
+      setSelectedAd(null);
+      setIsModalClosing(false);
+      closeTimeoutRef.current = null;
+    }, 220);
+  }
+
   return (
-    <div className="page">
-      <header className="hero">
-        <div>
-          <p className="eyebrow">MAG_OBYAVA</p>
-          <h1>Последние объявления</h1>
-          <p>Фильтруй и подавай новое объявление прямо из Mini-App.</p>
-        </div>
-        <div style={{display: 'flex', gap: 8, alignItems: 'center'}}>
-          <button className="primary-button" onClick={() => setShowCreate(true)}>Подать объявление</button>
-        </div>
-      </header>
+    <div className={styles.page}>
+      <div className={styles.device}>
+        <div className={styles.screen} ref={screenRef}>
+          <div className={`${styles.header}${isScrolled ? ' ' + styles.headerShrink : ''}`}>
+            <div className={styles.title} onClick={resetSearch} role="button" tabIndex={0} onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                resetSearch();
+              }
+            }}>MAG_OBYAVA</div>
+            <div className={styles.topRow}>
+              <div className={styles.search}>
+                <button className={styles.searchButton} onClick={() => setShowSearchPanel((v) => !v)}>Пошук</button>
+              </div>
+              <button className={styles.btnAdd} onClick={handleAddClick}>Подати оголошення</button>
+            </div>
+            {showSearchPanel && (
+              <div className={styles.searchPanel}>
+                <div className={styles.searchRow} onClick={() => { setShowCategoryPicker((v) => !v); setShowLocationPicker(false); }}>
+                  Шукати за категоріями{selectedCategory ? `: ${selectedCategory}` : ''}
+                </div>
+                {showCategoryPicker && (
+                  <div className={styles.categoriesWrap}>
+                    <div className={styles.categoriesStrip} ref={categoryStripRef}>
+                      {categories.map((c) => (
+                        <button key={c} className={`${styles.categoryItem} ${selectedCategory === c ? styles.active : ''}`} onClick={() => { setSelectedCategory(c); setSearchQuery(c); setSelectedLocation(''); }}>
+                          {c}
+                        </button>
+                      ))}
+                    </div>
+                    <div className={styles.customScrollbar} aria-hidden>
+                      <div className={styles.customScrollbarThumb} ref={categoryThumbRef}></div>
+                    </div>
+                  </div>
+                )}
 
-      <section className="filters">
-        <div className="chips">
-          {categories.slice(0, 6).map((item) => (
-            <button
-              key={item}
-              type="button"
-              className={item === category ? 'chip active' : 'chip'}
-              onClick={() => setCategory(item)}
-            >
-              {item}
-            </button>
-          ))}
-        </div>
-        <div className="chips">
-          {locations.map((item) => (
-            <button
-              key={item}
-              type="button"
-              className={item === location ? 'chip active' : 'chip'}
-              onClick={() => setLocation(item)}
-            >
-              {item}
-            </button>
-          ))}
-        </div>
-      </section>
+                <div className={styles.searchRow} onClick={() => { setShowLocationPicker((v) => !v); setShowCategoryPicker(false); }}>
+                  Шукати за локацією{selectedLocation ? `: ${selectedLocation}` : ''}
+                </div>
+                {showLocationPicker && (
+                  <div className={styles.categoriesWrap}>
+                    <div className={styles.categoriesStrip} ref={locationStripRef}>
+                      {locations.map((l) => (
+                        <button key={l} className={`${styles.categoryItem} ${selectedLocation === l ? styles.active : ''}`} onClick={() => { setSelectedLocation(l); setSearchQuery(l); setSelectedCategory(''); }}>
+                          {l}
+                        </button>
+                      ))}
+                    </div>
+                    <div className={styles.customScrollbar} aria-hidden>
+                      <div className={styles.customScrollbarThumb} ref={locationThumbRef}></div>
+                    </div>
+                  </div>
+                )}
 
-      <main className="content">
-        {statusMessage ? <p className={`status ${statusMessage.type==='error'?'error':''}`}>{statusMessage.text}</p> : null}
-        {loading ? <p className="status">Загрузка...</p> : null}
-        {error ? <p className="status error">{error}</p> : null}
-        {!loading && !ads.length ? <p className="status">Объявления не найдены.</p> : null}
-        <div className="cards">
-          {ads.map((ad) => (
-            <AdCard key={ad.id} ad={ad} />
-          ))}
+                <div className={styles.searchRow}>
+                  <input className={styles.searchInputInline} placeholder="Введіть текст для пошуку" value={searchText} onChange={(e) => setSearchText(e.target.value)} />
+                  <button className={styles.categoryItem} onClick={() => { setSearchQuery(searchText); setShowSearchPanel(false); }}>Пошук</button>
+                </div>
+                <div className={styles.searchActions}>
+                  <button className={styles.resetButtonSecondary} onClick={resetSearch}>Скинути пошук</button>
+                </div>
+              </div>
+            )}
+            <div className={styles.headerInfo}>
+              <span>{headerInfoText}</span>
+              <span>{headerInfoRightText}</span>
+            </div>
+          </div>
+
+          {statusMessage && !showPromo && (
+            <div className={`${styles.status} ${styles[statusMessage.type]}`}>
+              <div>{statusMessage.text}</div>
+              {postedAdLink && (
+                <div style={{ marginTop: 4 }}>
+                  <a href={postedAdLink} target="_blank" rel="noopener noreferrer" className={styles.contactLink}>
+                    Перейти до оголошення
+                  </a>
+                </div>
+              )}
+            </div>
+          )}
+          {loading && !showPromo && <div className={styles.status}>Завантаження...</div>}
+
+          <div className={styles.grid}>
+            {visibleAds.map((ad, index) => (
+              <AdCard key={ad.id} ad={ad} index={index} onClick={() => setSelectedAd(ad)} />
+            ))}
+          </div>
+
+          {showPromo && (
+            <div className={styles.promoModalOverlay}>
+              <div className={styles.promoCard}>
+                <div className={styles.promoText}>{getPromoTitle()}</div>
+                <div className={styles.promoActions}>
+                  {currentUser?.free_ad_used ? (
+                    <button className={styles.primaryButton} onClick={() => setStatusMessage({ type: 'info', text: 'Оплата наразі не налаштована.' })}>
+                      Оплатити
+                    </button>
+                  ) : (
+                    <button className={styles.primaryButton} onClick={handleProceedCreate}>
+                      Створити оголошення
+                    </button>
+                  )}
+                  <button className={styles.resetButtonSecondary} onClick={handleClosePromo}>
+                    Повернутись
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-      </main>
+      </div>
 
       {showCreate && (
-        <CreateAd onClose={()=>setShowCreate(false)} onSubmit={handleCreateSubmit} />
+        <CreateAd
+          onClose={() => setShowCreate(false)}
+          onSubmit={handleCreateSubmit}
+          currentUser={currentUser}
+          mode={currentUser?.free_ad_used ? 'paid' : 'free'}
+          onPay={() => setStatusMessage({ type: 'info', text: 'Оплата наразі не налаштована.' })}
+        />
       )}
+      {selectedAd && (() => {
+        const contactInfo = parseContactInfo(selectedAd.contacts);
+        const telegramLink = contactInfo.telegram || (selectedAd.username ? `https://t.me/${String(selectedAd.username).replace(/^@/, '')}` : null);
+        return (
+          <div
+            className={`${styles.previewModal}${isModalClosing ? ' ' + styles.previewModalClosing : ''}`}
+            onClick={closeModal}
+          >
+            <div className={styles.previewModalFrame} onClick={(e) => e.stopPropagation()}>
+              <button className={styles.previewModalClose} onClick={closeModal} aria-label="Закрити">✕</button>
+              <article className={`${styles.card} ${styles.previewCard}`}>
+                <div className={`${styles.cardImage} ${styles.previewModalImage}`} style={{ backgroundImage: `url(${selectedAd.img})` }}>
+                  <div className={`${styles.cardTags} ${styles.previewModalTags}`}>
+                    <span className={`${styles.cardTag} ${styles.purple}`}>#{selectedAd.category.split(' ')[0].toLowerCase()}</span>
+                    <span className={`${styles.cardTag} ${styles.blue}`}>#{((selectedAd.location || 'місто').split(' ')[0] || 'місто').toLowerCase()}</span>
+                  </div>
+                </div>
+                <div className={`${styles.cardBody} ${styles.previewModalBody}`}>
+                  <div className={`${styles.cardTitle} ${styles.previewDescription}`}>{selectedAd.description || selectedAd.title || ''}</div>
+                  <div className={styles.cardInfo}>
+                    <div>Місто: {selectedAd.location}</div>
+                    <div className={styles.contactRow}>
+                      <span className={styles.contactLabel}>Контакт:</span>
+                      <div className={styles.contactActions}>
+                        {telegramLink && (
+                          <a
+                            className={`${styles.contactActionButton} ${styles.writeButton}`}
+                            href={telegramLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Написати
+                          </a>
+                        )}
+                        {contactInfo.phone && (
+                          <a
+                            className={`${styles.contactActionButton} ${styles.callButton}`}
+                            href={contactInfo.phone}
+                          >
+                            Позвонити
+                          </a>
+                        )}
+                        {!contactInfo.telegram && !contactInfo.phone && (
+                          <span className={styles.contactValue}>не вказано</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
-
-export default App;

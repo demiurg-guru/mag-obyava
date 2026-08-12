@@ -1,0 +1,148 @@
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(18px);
+  z-index: 60;
+}
+
+.modalCard {
+  position: relative;
+  width: min(380px,100%);
+  max-width: 380px;
+  border-radius: 32px;
+  background: linear-gradient(180deg, rgba(24,86,95,0.95) 0%, rgba(0,208,255,0.95) 45%, rgba(54,129,165,0.95) 100%);
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 28px 60px rgba(0,0,0,0.45);
+  overflow: hidden;
+}
+.modalCard::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.28);
+  border-radius: inherit;
+  z-index: 0;
+  pointer-events: none;
+}
+.modalCard > * {
+  position: relative;
+  z-index: 1;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 16px 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.modalHeader h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #f8fbff;
+}
+.modalHeader button {
+  border: none;
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  border-radius: 999px;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modalBody {
+  padding: 16px;
+  display: grid;
+  gap: 14px;
+}
+.modalBody label {
+  font-size: 13px;
+  color: #4bf508;
+  font-weight: 600;
+}
+.tgDebug {
+  font-size: 12px;
+  color: rgba(255,255,255,0.75);
+  margin-bottom: 8px;
+}
+.modalBody input, .modalBody textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgb(18 18 18 / 24%);
+  border: 1px solid rgba(255,255,255,0.06);
+  color: #e6f7fb;
+  font-size: 14px;
+}
+.modalBody select {
+  width: 100%;
+  padding: 12px 20px 12px 14px;
+  border-radius: 16px;
+  background: rgb(18 18 18 / 24%);
+  border: 1px solid rgba(255,255,255,0.06);
+  color: #e6f7fb;
+  font-size: 14px;
+}
+.modalBody textarea {
+  min-height: 140px;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.charCounter {
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  font-size: 12px;
+  color: rgba(0,0,0,0.7);
+  background: transparent;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.modalBody select option {
+  background: rgba(3,40,44,0.96);
+  color: #e6f7fb;
+}
+
+.manualContactInput::placeholder {
+  color: rgba(255,255,255,0.7);
+}
+
+.modalActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+.modalActions button {
+  flex: 1;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+}
+.primaryButton {
+  background: linear-gradient(135deg, #00d0ff 0%, #bc20cf 100%);
+  color: #fff;
+}
+.modalActions button:not(.primaryButton) {
+  background: rgba(255,255,255,0.08);
+  color: #eef8f6;
+}
+
+.contactLink {
+  color: #0066cc;
+  text-decoration: underline;
+  font-weight: 700;
+}

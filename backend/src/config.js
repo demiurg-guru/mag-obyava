@@ -5,8 +5,6 @@ if (result.error) {
   console.warn('Warning: .env file not found or could not be read');
 }
 
-const dotenv = require('dotenv');
-
 const required = [
   'SUPABASE_URL',
   'SUPABASE_KEY',
