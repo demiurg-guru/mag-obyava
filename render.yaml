@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: mag-obyava-backend
+    env: node
+    buildCommand: "cd backend && npm install"
+    startCommand: "cd backend && npm start"
+    plan: free
+    envVars:
+      - key: TELEGRAM_TOKEN
+        prompt: true
+      - key: SUPABASE_URL
+        prompt: true
+      - key: SUPABASE_KEY
+        prompt: true
+      - key: PUBLIC_ORIGIN
+        value: "https://demiurg-guru.github.io/mag-obyava"
