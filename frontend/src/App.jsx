@@ -3,7 +3,7 @@ import CreateAd from './CreateAd.jsx';
 import styles from './App.module.css';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
-const DEFAULT_CARD_IMAGE = '/assets/mag-obyava-banner.jpg';
+const DEFAULT_CARD_IMAGE = `${import.meta.env.BASE_URL}assets/mag-obyava-banner.jpg`;
 
 const defaultAds = [
   {
@@ -181,6 +181,8 @@ function parseContactInfo(contact) {
 
 function normalizeAd(ad) {
   if (!ad || typeof ad !== 'object') return null;
+  const rawImg = ad.img || ad.photo_url || null;
+  const hasValidImg = rawImg && rawImg !== 'null' && rawImg !== 'undefined' && String(rawImg).trim() !== '';
   return {
     ...ad,
     id: String(ad.id ?? Date.now()),
@@ -190,7 +192,7 @@ function normalizeAd(ad) {
     username: ad.username || null,
     category: ad.category || 'Інше',
     location: ad.location || 'Невідомо',
-    img: ad.img || DEFAULT_CARD_IMAGE
+    img: hasValidImg ? rawImg : DEFAULT_CARD_IMAGE
   };
 }
 
@@ -202,10 +204,13 @@ function AdCard({ ad, index, onClick }) {
     animationDelay: `${index * -2.2}s`
   };
   const cardText = getWordSnippet(ad.description || ad.title || '', 10) || 'Немає опису оголошення';
+  const imgUrl = ad.img && ad.img !== 'null' && ad.img !== 'undefined' && String(ad.img).trim() !== '' 
+    ? ad.img 
+    : DEFAULT_CARD_IMAGE;
 
   return (
     <article className={styles.card} style={{ ...cardStyle, cursor: 'pointer' }} onClick={onClick}>
-      <div className={styles.cardImage} style={{ backgroundImage: `url(${ad.img || DEFAULT_CARD_IMAGE})` }}>
+      <div className={styles.cardImage} style={{ backgroundImage: `url(${imgUrl})` }}>
         <div className={styles.cardTags}>
           <span className={`${styles.cardTag} ${styles.purple}`}>{categoryTag}</span>
           <span className={`${styles.cardTag} ${styles.blue}`}>{locationTag}</span>

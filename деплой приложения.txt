@@ -1,0 +1,30 @@
+
+✅ GitHub Actions запущен!
+
+Теперь:
+
+Откройте: https://github.com/demiurg-guru/mag-obyava/actions
+Смотрите статус workflow Deploy Frontend to GitHub Pages (должен быть зелёный галочка через 1-2 минуты)
+Когда готово, откройте: https://demiurg-guru.github.io/mag-obyava/
+Там должно появиться ваше приложение.
+
+После успешного деплоя фронтенда:
+Переходим к бэкенду на Render.com:
+
+Откройте https://render.com
+Нажмите "New" → "Web Service"
+Подключите GitHub репозиторий demiurg-guru/mag-obyava
+Настройте:
+Name: mag-obyava-backend
+Environment: Node
+Build Command: cd backend && npm install
+Start Command: cd backend && npm start
+Plan: Free
+Добавьте Environment Variables:
+TELEGRAM_TOKEN = ваш токен из Telegram
+SUPABASE_URL = ваша ссылка Supabase
+SUPABASE_KEY = ваш Supabase ключ
+PUBLIC_ORIGIN = https://demiurg-guru.github.io/mag-obyava
+Когда будет готово, Render даст вам URL типа: https://mag-obyava-xxxxx.render.com
+
+Сообщите мне этот URL, и я обновлю фронтенд .env.production с правильным API адресом.
