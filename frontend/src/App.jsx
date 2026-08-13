@@ -476,8 +476,9 @@ export default function App() {
   async function loadAds({ showSpinner = false } = {}) {
     if (showSpinner) setLoading(true);
     const tgUser = getEffectiveTelegramUser();
+    const isRealTelegramUser = typeof window !== 'undefined' && window.Telegram?.WebApp?.initDataUnsafe?.user;
 
-    if (tgUser) {
+    if (isRealTelegramUser) {
       setTgStatus({ available: true, user: tgUser });
       await loadCurrentUserInfo(tgUser);
     } else {
@@ -486,7 +487,7 @@ export default function App() {
     }
 
     const headers = {};
-    if (tgUser?.id) headers['x-telegram-id'] = String(tgUser.id);
+    if (isRealTelegramUser && tgUser?.id) headers['x-telegram-id'] = String(tgUser.id);
 
     try {
       const res = await fetch(`${API_BASE}/api/ads`, { headers });
@@ -539,8 +540,8 @@ export default function App() {
         if (value !== null && value !== undefined) fd.append(k, value);
       });
 
-      const effectiveUser = getEffectiveTelegramUser();
-      if (effectiveUser?.id) {
+      const effectiveUser = tgStatus.user || getEffectiveTelegramUser();
+      if (effectiveUser?.id && tgStatus.user) {
         setCurrentUser({
           username: effectiveUser.username || null,
           telegram_user_id: effectiveUser.id,
@@ -549,7 +550,7 @@ export default function App() {
       }
 
       const headers = {};
-      if (effectiveUser?.id) headers['x-telegram-id'] = String(effectiveUser.id);
+      if (effectiveUser?.id && tgStatus.user) headers['x-telegram-id'] = String(effectiveUser.id);
       
       const res = await fetch(`${API_BASE}/api/ads`, { method: 'POST', headers, body: fd });
       const data = await res.json().catch(() => null);
@@ -613,7 +614,7 @@ export default function App() {
             {showSearchPanel && (
               <div className={styles.searchPanel}>
                 <div className={styles.searchRow} onClick={() => { setShowCategoryPicker((v) => !v); setShowLocationPicker(false); }}>
-                  Шукати за категоріями{selectedCategory ? `: ${selectedCategory}` : ''}
+                  {selectedCategory ? `Вибрана категория: ${selectedCategory}` : 'Шукати за категоріями'}
                 </div>
                 {showCategoryPicker && (
                   <div className={styles.categoriesWrap}>
@@ -631,7 +632,7 @@ export default function App() {
                 )}
 
                 <div className={styles.searchRow} onClick={() => { setShowLocationPicker((v) => !v); setShowCategoryPicker(false); }}>
-                  Шукати за локацією{selectedLocation ? `: ${selectedLocation}` : ''}
+                  {selectedLocation ? `Вибрана локація: ${selectedLocation}` : 'Шукати за локацією'}
                 </div>
                 {showLocationPicker && (
                   <div className={styles.categoriesWrap}>
@@ -712,6 +713,7 @@ export default function App() {
           onClose={() => setShowCreate(false)}
           onSubmit={handleCreateSubmit}
           currentUser={currentUser}
+          telegramUser={tgStatus.user}
           mode={currentUser?.free_ad_used ? 'paid' : 'free'}
           onPay={() => setStatusMessage({ type: 'info', text: 'Оплата наразі не налаштована.' })}
         />
@@ -726,42 +728,41 @@ export default function App() {
           >
             <div className={styles.previewModalFrame} onClick={(e) => e.stopPropagation()}>
               <button className={styles.previewModalClose} onClick={closeModal} aria-label="Закрити">✕</button>
+
               <article className={`${styles.card} ${styles.previewCard}`}>
-                <div className={`${styles.cardImage} ${styles.previewModalImage}`} style={{ backgroundImage: `url(${selectedAd.img || DEFAULT_CARD_IMAGE})` }}>
-                  <div className={`${styles.cardTags} ${styles.previewModalTags}`}>
-                    <span className={`${styles.cardTag} ${styles.purple}`}>#{selectedAd.category.split(' ')[0].toLowerCase()}</span>
-                    <span className={`${styles.cardTag} ${styles.blue}`}>#{((selectedAd.location || 'місто').split(' ')[0] || 'місто').toLowerCase()}</span>
-                  </div>
-                </div>
-                <div className={`${styles.cardBody} ${styles.previewModalBody}`}>
-                  <div className={`${styles.cardTitle} ${styles.previewDescription}`}>{selectedAd.description || selectedAd.title || ''}</div>
+                <div className={`${styles.cardImage} ${styles.previewModalImage}`} style={{ backgroundImage: `url(${selectedAd.img || DEFAULT_CARD_IMAGE})` }} />
+                <div className={styles.cardBody}>
+                  <div className={styles.cardTitle}>{selectedAd.title || getWordSnippet(selectedAd.description || '', 12)}</div>
                   <div className={styles.cardInfo}>
-                    <div>Місто: {selectedAd.location}</div>
-                    <div className={styles.contactRow}>
-                      <span className={styles.contactLabel}>Контакт:</span>
-                      <div className={styles.contactActions}>
-                        {telegramLink && (
-                          <a
-                            className={`${styles.contactActionButton} ${styles.writeButton}`}
-                            href={telegramLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            Написати
-                          </a>
-                        )}
-                        {contactInfo.phone && (
-                          <a
-                            className={`${styles.contactActionButton} ${styles.callButton}`}
-                            href={contactInfo.phone}
-                          >
-                            Позвонити
-                          </a>
-                        )}
-                        {!contactInfo.telegram && !contactInfo.phone && (
-                          <span className={styles.contactValue}>не вказано</span>
-                        )}
-                      </div>
+                    Місто: {selectedAd.location}
+                    <br />
+                    Контакт: {selectedAd.contacts}
+                  </div>
+
+                  <div className={styles.contactRow}>
+                    <span className={styles.contactLabel}>Контакт:</span>
+                    <div className={styles.contactActions}>
+                      {telegramLink && (
+                        <a
+                          className={`${styles.contactActionButton} ${styles.writeButton}`}
+                          href={telegramLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Написати
+                        </a>
+                      )}
+                      {contactInfo.phone && (
+                        <a
+                          className={`${styles.contactActionButton} ${styles.callButton}`}
+                          href={contactInfo.phone}
+                        >
+                          Позвонити
+                        </a>
+                      )}
+                      {!telegramLink && !contactInfo.phone && (
+                        <span className={styles.contactValue}>не вказано</span>
+                      )}
                     </div>
                   </div>
                 </div>

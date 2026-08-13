@@ -4,7 +4,7 @@ import styles from './CreateAd.module.css';
 const categories = ['Транспорт','Послуги','Робота','Нерухомість','Товари інше','Будівництво','Сільгосп','Електроніка','Меблі','Одяг/Взуття'];
 const locations = ['Магдалинівка','Спаське','Підгороднє','Котовка'];
 
-export default function CreateAd({ onClose, onSubmit, currentUser }) {
+export default function CreateAd({ onClose, onSubmit, currentUser, telegramUser }) {
   const [category, setCategory] = useState('');
   const [location, setLocation] = useState('');
   const [customLocation, setCustomLocation] = useState('');
@@ -114,7 +114,7 @@ export default function CreateAd({ onClose, onSubmit, currentUser }) {
       return alert('Будь ласка, введіть номер телефону для контакту');
     }
 
-    const finalUsername = currentUser?.username ? currentUser.username.replace(/^@/, '') : '';
+    const finalUsername = telegramUser?.username ? telegramUser.username.replace(/^@/, '') : (currentUser?.username ? currentUser.username.replace(/^@/, '') : '');
 
     onSubmit({
       category,
@@ -161,8 +161,8 @@ export default function CreateAd({ onClose, onSubmit, currentUser }) {
 
   const contactLabel = contactStatus === 'loading'
     ? 'Завантаження контакту...'
-    : ((currentUser?.username ? `@${currentUser.username.replace(/^@/, '')}` : '')
-      + ((contactStatus === 'phone' && contacts) ? `${currentUser?.username ? ' · ' : ''}${contacts}` : ''))
+    : ((telegramUser?.username ? `@${telegramUser.username.replace(/^@/, '')}` : (currentUser?.username ? `@${currentUser.username.replace(/^@/, '')}` : ''))
+      + ((contactStatus === 'phone' && contacts) ? `${telegramUser?.username || currentUser?.username ? ' · ' : ''}${contacts}` : ''))
       || 'Контакт недоступний';
 
   return (
@@ -208,8 +208,8 @@ export default function CreateAd({ onClose, onSubmit, currentUser }) {
                 <span>
                   {contactStatus === 'loading'
                     ? 'Завантаження контакту...'
-                    : ((currentUser?.username ? `@${currentUser.username.replace(/^@/, '')}` : '')
-                      + ((contactStatus === 'phone' && contacts) ? `${currentUser?.username ? ' · ' : ''}${contacts}` : ''))
+                    : ((telegramUser?.username ? `@${telegramUser.username.replace(/^@/, '')}` : (currentUser?.username ? `@${currentUser.username.replace(/^@/, '')}` : ''))
+                      + ((contactStatus === 'phone' && contacts) ? `${telegramUser?.username || currentUser?.username ? ' · ' : ''}${contacts}` : ''))
                       || 'Контакт недоступний'
                   }
                 </span>
