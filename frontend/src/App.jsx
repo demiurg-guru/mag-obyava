@@ -722,8 +722,8 @@ export default function App() {
           >
             <div className={styles.previewModalFrame} onClick={(e) => e.stopPropagation()}>
               <button className={styles.previewModalClose} onClick={closeModal} aria-label="Закрити">✕</button>
-              <article className={`${styles.card} ${styles.previewCard}`}>
-                <div className={`${styles.cardImage} ${styles.previewModalImage}`} style={{ backgroundImage: `url(${selectedAd.img})` }}>
+              <article className={`${styles.card} ${styles.previewCard}`}>                
+                <div className={`${styles.cardImage} ${styles.previewModalImage}`} style={{ backgroundImage: `url(${selectedAd.img || DEFAULT_CARD_IMAGE})` }}>
                   <div className={`${styles.cardTags} ${styles.previewModalTags}`}>
                     <span className={`${styles.cardTag} ${styles.purple}`}>#{selectedAd.category.split(' ')[0].toLowerCase()}</span>
                     <span className={`${styles.cardTag} ${styles.blue}`}>#{((selectedAd.location || 'місто').split(' ')[0] || 'місто').toLowerCase()}</span>
