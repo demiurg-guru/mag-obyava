@@ -3,7 +3,8 @@ import CreateAd from './CreateAd.jsx';
 import styles from './App.module.css';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
-const DEFAULT_CARD_IMAGE = '/assets/mag-obyava-banner.jpg';
+// const DEFAULT_CARD_IMAGE = '/assets/mag-obyava-banner.jpg';
+const DEFAULT_CARD_IMAGE = `${import.meta.env.BASE_URL}assets/mag-obyava-banner.jpg`;
 
 const defaultAds = [
   {
