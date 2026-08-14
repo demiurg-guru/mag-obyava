@@ -60,8 +60,7 @@
   position: sticky;
   top: 0;
   z-index: 20;
-  padding: 4px 30px 4px;
-  margin: 0 -12px 10px;
+  margin: 0 -8px 24px;
   /* background: rgba(255, 255, 255, 0.10); */
   background-image: linear-gradient(180deg, rgba(24, 86, 95, 0.75) 0%, rgba(0, 208, 255, 0.55) 45%, rgba(54, 129, 165, 0.75) 100%), url(/assets/app-bg.jpg);
   background-size: cover;
@@ -152,9 +151,10 @@
 
 .headerInfo {
   /* margin: 0 0 6px; */
-  /* padding: 4px 8px; */
+  padding: 4px 8px;
   /* border-radius: 10px; */
   /* background: rgba(255, 255, 255, 0.12); */
+  background: rgb(0 206 255 / 11%);
   color: #dfe7f2;
   font-size: 16px;
   font-weight: 500;
@@ -259,9 +259,20 @@
   position: relative;
 }
 
+@media (max-width: 900px) {
+  .categoriesWrap {
+    width: 100%;
+    max-width: 430px;
+    position: relative;
+        left: 0;
+        top: 0;
+        right: auto;
+  }
+}
+
 .categoriesStrip {
   display: flex;
-  gap: 8px;
+  /* gap: 8px; */
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   padding: 8px 6px 12px;
@@ -326,7 +337,7 @@
 .customScrollbarThumb:active { cursor: grabbing; }
 
 .searchPanel {
-  background: rgba(0, 0, 0, .2);
+  background: rgba(0, 0, 0, .4);
   font-family: 'Segoe UI', Arial, sans-serif;
   font-size: 16px;
   font-weight: 600;
@@ -361,7 +372,7 @@
 
 .searchRow {
   cursor: pointer;
-  padding: 8px 50px;
+  padding: 8px 35px;
   font-size: 16px;
   font-weight: 500;
 }
@@ -388,31 +399,31 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
+  gap: 14px;
   width: 100%;
 }
 
-/* Планшеты */
+
 @media (min-width: 600px) {
   .grid {
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+    gap: 16px;
   }
 }
 
-/* Десктоп */
+
 @media (min-width: 900px) {
   .grid {
     grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
+    gap: 20px;
   }
 }
 
-/* Large экраны */
+
 @media (min-width: 1400px) {
   .grid {
     grid-template-columns: repeat(5, 1fr);
-    gap: 14px;
+    gap: 24px;
   }
 }
 
