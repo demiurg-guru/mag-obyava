@@ -26,7 +26,6 @@
   background-repeat: no-repeat;
   background-blend-mode: overlay;
   overflow-y: auto;
-  scrollbar-gutter: stable;
   padding: 0px 12px 24px;
   scrollbar-width: none;
   -ms-overflow-style: none;
