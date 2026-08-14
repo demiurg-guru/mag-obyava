@@ -180,13 +180,14 @@
 } */
 
 .searchButton {
-  width: 260px;
+  width: 100%;
+  max-width: 260px;
   background: #00d0ff;
   color: #fff;
   border: none;
   border-radius: 16px;
   padding: 8px 24px;
-  font-family: 'Segoe UI', Arial, sans-serif;
+  /* font-family: 'Segoe UI', Arial, sans-serif; */
   font-size: 16px;
   font-weight: 600;
   line-height: 1.4;
@@ -233,7 +234,8 @@
 }
 
 .btnAdd {
-  width: 260px;
+  width: 100%;
+  max-width: 260px;
   background: #bb0fb4;
   color: #fff;
   border: none;
