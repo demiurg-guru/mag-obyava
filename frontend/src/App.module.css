@@ -257,18 +257,42 @@
 
 .categoriesWrap {
   position: relative;
+  width: 100%;
 }
 
-@media (max-width: 900px) {
+@media (min-width: 320px) {
   .categoriesWrap {
-    width: 100%;
-    max-width: 430px;
-    position: relative;
-        left: 0;
-        top: 0;
-        right: auto;
+    max-width: 320px;
   }
 }
+
+@media (min-width: 420px) {
+  .categoriesWrap {
+    max-width: 420px;
+  }
+}
+
+@media (max-width: 640px) {
+  .categoriesWrap {
+    max-width: 640px;
+  }
+}
+
+@media (max-width: 780px) {
+  .categoriesWrap {
+    max-width: 780px;
+  }
+}
+
+
+
+
+
+
+
+
+
+
 
 .categoriesStrip {
   display: flex;

@@ -179,6 +179,12 @@ function parseContactInfo(contact) {
   return result;
 }
 
+function getTelegramInitData() {
+  // Raw signed string Telegram provides — this is what the backend verifies.
+  // (initDataUnsafe is the parsed-but-unverified version, used elsewhere for display only.)
+  return typeof window !== 'undefined' ? (window.Telegram?.WebApp?.initData || null) : null;
+}
+
 function normalizeAd(ad) {
   if (!ad || typeof ad !== 'object') return null;
   const rawImg = ad.img || ad.photo_url || null;
@@ -274,6 +280,8 @@ export default function App() {
       return;
     }
     const headers = { 'x-telegram-id': String(tgUser.id) };
+    const initData = getTelegramInitData();
+    if (initData) headers['X-Telegram-Init-Data'] = initData;
 
     try {
       const res = await fetch(`${API_BASE}/api/me`, { headers });
@@ -484,10 +492,13 @@ export default function App() {
     } else {
       setCurrentUser(null);
       setTgStatus({ available: false, user: null });
+      setUserLoaded(true);
     }
 
     const headers = {};
     if (isRealTelegramUser && tgUser?.id) headers['x-telegram-id'] = String(tgUser.id);
+    const initData = getTelegramInitData();
+    if (initData) headers['X-Telegram-Init-Data'] = initData;
 
     try {
       const res = await fetch(`${API_BASE}/api/ads`, { headers });
@@ -503,6 +514,7 @@ export default function App() {
       setAds(defaultAds);
     } finally {
       if (showSpinner) setLoading(false);
+      setUserLoaded(true);
     }
   }
 
@@ -551,6 +563,8 @@ export default function App() {
 
       const headers = {};
       if (effectiveUser?.id && tgStatus.user) headers['x-telegram-id'] = String(effectiveUser.id);
+      const initData = getTelegramInitData();
+      if (initData) headers['X-Telegram-Init-Data'] = initData;
       
       const res = await fetch(`${API_BASE}/api/ads`, { method: 'POST', headers, body: fd });
       const data = await res.json().catch(() => null);
@@ -714,6 +728,7 @@ export default function App() {
           onSubmit={handleCreateSubmit}
           currentUser={currentUser}
           telegramUser={tgStatus.user}
+          initData={getTelegramInitData()}
           mode={currentUser?.free_ad_used ? 'paid' : 'free'}
           onPay={() => setStatusMessage({ type: 'info', text: 'Оплата наразі не налаштована.' })}
         />
@@ -732,7 +747,7 @@ export default function App() {
               <article className={`${styles.card} ${styles.previewCard}`}>
                 <div className={`${styles.cardImage} ${styles.previewModalImage}`} style={{ backgroundImage: `url(${selectedAd.img || DEFAULT_CARD_IMAGE})` }} />
                 <div className={styles.cardBody}>
-                  <div className={styles.cardTitle}>{selectedAd.title || getWordSnippet(selectedAd.description || '', 12)}</div>
+                  <div className={styles.previewDescription}>{selectedAd.description}</div>
                   <div className={styles.cardInfo}>
                     Місто: {selectedAd.location}
                     <br />

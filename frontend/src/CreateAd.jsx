@@ -4,7 +4,7 @@ import styles from './CreateAd.module.css';
 const categories = ['Транспорт','Послуги','Робота','Нерухомість','Товари інше','Будівництво','Сільгосп','Електроніка','Меблі','Одяг/Взуття'];
 const locations = ['Магдалинівка','Спаське','Підгороднє','Котовка'];
 
-export default function CreateAd({ onClose, onSubmit, currentUser, telegramUser }) {
+export default function CreateAd({ onClose, onSubmit, currentUser, telegramUser, initData }) {
   const [category, setCategory] = useState('');
   const [location, setLocation] = useState('');
   const [customLocation, setCustomLocation] = useState('');
@@ -32,6 +32,7 @@ export default function CreateAd({ onClose, onSubmit, currentUser, telegramUser 
 
     setContactStatus('loading');
     const headers = { 'x-telegram-id': String(telegramUserId) };
+    if (initData) headers['X-Telegram-Init-Data'] = initData;
     const shareSupported = typeof window !== 'undefined' && typeof window.Telegram?.WebApp?.requestContact === 'function';
     setShareContactSupported(shareSupported);
 

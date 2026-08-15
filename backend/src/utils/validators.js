@@ -32,7 +32,7 @@ function validateCategory(category) {
 }
 
 function validateLocation(location) {
-  return typeof location === 'string' && (LOCATIONS.includes(location) || location.trim().length > 0);
+  return typeof location === 'string' && LOCATIONS.includes(location.trim());
 }
 
 function validateContact(contact) {

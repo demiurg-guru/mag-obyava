@@ -5,6 +5,7 @@ const { port, publicOrigin } = require('./config');
 const adsRoutes = require('./routes/ads');
 const healthRoutes = require('./routes/health');
 const meRoutes = require('./routes/me');
+const telegramWebhookRoutes = require('./routes/telegramWebhook');
 const errorHandler = require('./middleware/errorHandler');
 const { startCronjob } = require('./services/cronjob');
 
@@ -49,6 +50,7 @@ app.use(express.urlencoded({ extended: true, limit: '12mb' }));
 app.use('/api/ads', upload.single('photo'), adsRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/api/me', meRoutes);
+app.use('/api/telegram/webhook', telegramWebhookRoutes);
 app.use(errorHandler);
 
 app.listen(port, () => {

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { requireTelegramId } = require('../middleware/auth');
+const { telegramChannelId } = require('../config');
 const { validateDescription, validateCategory, validateLocation, validateContact, normalizeContact } = require('../utils/validators');
 const {
   getUser,
@@ -210,7 +211,13 @@ router.post('/', requireTelegramId, async (req, res, next) => {
       await updateUserFreeAdUsed(telegramId, true);
     }
 
-    const telegramLink = `https://t.me/${String(process.env.TELEGRAM_CHANNEL_ID).replace(/^@/, '')}/${messageId}`;
+    // Public t.me links only work for channels with a public @username.
+    // A numeric chat_id (e.g. "-1001234567890") has no public link, so we
+    // skip building one rather than returning a broken URL.
+    const channelHandle = String(telegramChannelId || '').replace(/^@/, '');
+    const telegramLink = /^-?\d+$/.test(channelHandle)
+      ? null
+      : `https://t.me/${channelHandle}/${messageId}`;
     // fetch final ad record (with img and telegram_message_id) and return it to client
     const finalAd = await getAdById(ad.id);
     res.json({ success: true, ad: finalAd, ad_id: ad.id, telegram_link: telegramLink });
