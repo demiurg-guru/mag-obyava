@@ -3,6 +3,7 @@ import styles from './CreateAd.module.css';
 
 const categories = ['Транспорт','Послуги','Робота','Нерухомість','Товари інше','Будівництво','Сільгосп','Електроніка','Меблі','Одяг/Взуття'];
 const locations = ['Магдалинівка','Спаське','Підгородне','Котовка'];
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 
 export default function CreateAd({ onClose, onSubmit, currentUser, telegramUser, initData }) {
   const [category, setCategory] = useState('');
@@ -16,10 +17,30 @@ export default function CreateAd({ onClose, onSubmit, currentUser, telegramUser,
   const [askPhone, setAskPhone] = useState(false);
   const [shareContactSupported, setShareContactSupported] = useState(false);
   const [sharingPhone, setSharingPhone] = useState(false);
+  const [photoError, setPhotoError] = useState('');
+  const [photoStatus, setPhotoStatus] = useState('');
 
   function handleFile(e) {
     const f = e.target.files?.[0];
-    setPhoto(f || null);
+    if (!f) {
+      setPhoto(null);
+      setPhotoError('');
+      setPhotoStatus('');
+      return;
+    }
+
+    if (f.size > MAX_IMAGE_SIZE) {
+      setPhoto(null);
+      setPhotoError('Файл занадто великий. Максимальний розмір — 5 МБ.');
+      setPhotoStatus('');
+      e.target.value = '';
+      return;
+    }
+
+    const sizeMb = (f.size / (1024 * 1024)).toFixed(2);
+    setPhoto(f);
+    setPhotoError('');
+    setPhotoStatus(`Фото готове: ${sizeMb} МБ`);
   }
 
   async function refreshContact(telegramUserId) {
@@ -102,8 +123,22 @@ export default function CreateAd({ onClose, onSubmit, currentUser, telegramUser,
     };
   }, [currentUser?.telegram_user_id]);
 
+  function getDisplayName() {
+    const direct = currentUser?.username || telegramUser?.username || currentUser?.first_name || telegramUser?.first_name || '';
+    return direct ? direct.replace(/^@/, '') : '';
+  }
+
+  function getDisplayTag() {
+    const name = getDisplayName();
+    return name ? `@${name}` : '';
+  }
+
   function submit(e) {
     e.preventDefault();
+    if (photo && photo.size > MAX_IMAGE_SIZE) {
+      setPhotoError('Файл занадто великий. Максимальний розмір — 5 МБ.');
+      return;
+    }
     if (!description.trim()) return alert('Введіть опис оголошення');
 
     const enteredLocation = customLocation.trim();
@@ -115,7 +150,7 @@ export default function CreateAd({ onClose, onSubmit, currentUser, telegramUser,
       return alert('Будь ласка, введіть номер телефону для контакту');
     }
 
-    const finalUsername = telegramUser?.username ? telegramUser.username.replace(/^@/, '') : (currentUser?.username ? currentUser.username.replace(/^@/, '') : '');
+    const finalUsername = getDisplayName();
 
     onSubmit({
       category,
@@ -160,11 +195,14 @@ export default function CreateAd({ onClose, onSubmit, currentUser, telegramUser,
     }
   }
 
+  const resolvedDisplayName = getDisplayName();
+  const resolvedDisplayTag = getDisplayTag();
+
   const contactLabel = contactStatus === 'loading'
     ? 'Завантаження контакту...'
-    : ((telegramUser?.username ? `@${telegramUser.username.replace(/^@/, '')}` : (currentUser?.username ? `@${currentUser.username.replace(/^@/, '')}` : ''))
-      + ((contactStatus === 'phone' && contacts) ? `${telegramUser?.username || currentUser?.username ? ' · ' : ''}${contacts}` : ''))
-      || 'Контакт недоступний';
+    : (resolvedDisplayTag
+      ? `${resolvedDisplayTag}${(contactStatus === 'phone' && contacts) ? ` · ${contacts}` : ''}`
+      : (contactStatus === 'phone' && contacts ? contacts : 'Контакт недоступний'));
 
   return (
     <div className={styles.modal}>
@@ -210,10 +248,9 @@ export default function CreateAd({ onClose, onSubmit, currentUser, telegramUser,
                 <span>
                   {contactStatus === 'loading'
                     ? 'Завантаження контакту...'
-                    : ((telegramUser?.username ? `@${telegramUser.username.replace(/^@/, '')}` : (currentUser?.username ? `@${currentUser.username.replace(/^@/, '')}` : ''))
-                      + ((contactStatus === 'phone' && contacts) ? `${telegramUser?.username || currentUser?.username ? ' · ' : ''}${contacts}` : ''))
-                      || 'Контакт недоступний'
-                  }
+                    : (resolvedDisplayTag
+                      ? `${resolvedDisplayTag}${(contactStatus === 'phone' && contacts) ? ` · ${contacts}` : ''}`
+                      : (contactStatus === 'phone' && contacts ? contacts : 'Контакт недоступний'))}
                 </span>
               </div>
               {shareContactSupported && contactStatus !== 'phone' && (
@@ -278,14 +315,18 @@ export default function CreateAd({ onClose, onSubmit, currentUser, telegramUser,
                   }}
                 />
                 <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', whiteSpace: 'nowrap' }}>
-                  TG: {telegramUser?.username ? telegramUser.username.replace(/^@/, '') : (currentUser?.username ? currentUser.username.replace(/^@/, '') : 'noname')}
+                  TG: {resolvedDisplayName || 'noname'}
                 </span>
               </div>
             </div>
           )}
 
           <label>Додати зображення (необов'язково)</label>
-          <input type="file" accept="image/*" onChange={handleFile} />
+          <div className={styles.fileUploadWrap}>
+            <input type="file" accept="image/*" onChange={handleFile} />
+            {photoError && <div className={styles.fileError}>{photoError}</div>}
+            {!photoError && photoStatus && <div className={styles.fileSuccess}>{photoStatus}</div>}
+          </div>
 
           <div className={styles.modalActions}>
             <button type="submit" className={styles.primaryButton}>Надіслати</button>

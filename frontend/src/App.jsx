@@ -289,14 +289,16 @@ export default function App() {
       const serverUser = data?.user || null;
       setCurrentUser({
         telegram_user_id: tgUser.id,
-        username: tgUser.username || serverUser?.username || null,
+        username: tgUser.username || serverUser?.username || tgUser.first_name || null,
+        first_name: tgUser.first_name || serverUser?.first_name || null,
         phone: serverUser?.phone || null,
         free_ad_used: !!serverUser?.free_ad_used
       });
     } catch (error) {
       setCurrentUser({
         telegram_user_id: tgUser.id,
-        username: tgUser.username || null,
+        username: tgUser.username || tgUser.first_name || null,
+        first_name: tgUser.first_name || null,
         phone: null,
         free_ad_used: false
       });
@@ -496,7 +498,8 @@ export default function App() {
     }
 
     const headers = {};
-    if (isRealTelegramUser && tgUser?.id) headers['x-telegram-id'] = String(tgUser.id);
+    const effectiveUser = getEffectiveTelegramUser();
+    if (effectiveUser?.id) headers['x-telegram-id'] = String(effectiveUser.id);
     const initData = getTelegramInitData();
     if (initData) headers['X-Telegram-Init-Data'] = initData;
 
@@ -553,7 +556,7 @@ export default function App() {
       });
 
       const effectiveUser = tgStatus.user || getEffectiveTelegramUser();
-      if (effectiveUser?.id && tgStatus.user) {
+      if (effectiveUser?.id) {
         setCurrentUser({
           username: effectiveUser.username || null,
           telegram_user_id: effectiveUser.id,
@@ -562,7 +565,7 @@ export default function App() {
       }
 
       const headers = {};
-      if (effectiveUser?.id && tgStatus.user) headers['x-telegram-id'] = String(effectiveUser.id);
+      if (effectiveUser?.id) headers['x-telegram-id'] = String(effectiveUser.id);
       const initData = getTelegramInitData();
       if (initData) headers['X-Telegram-Init-Data'] = initData;
       

@@ -127,6 +127,31 @@
   color: rgba(255,255,255,0.85);
 }
 
+.fileUploadWrap {
+  display: grid;
+  gap: 8px;
+}
+
+.fileError {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #ffd2d2;
+  background: rgba(255, 91, 91, 0.12);
+  border: 1px solid rgba(255, 110, 110, 0.26);
+  border-radius: 12px;
+  padding: 8px 10px;
+}
+
+.fileSuccess {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #d9ffea;
+  background: rgba(54, 182, 112, 0.12);
+  border: 1px solid rgba(54, 182, 112, 0.26);
+  border-radius: 12px;
+  padding: 8px 10px;
+}
+
 .modalActions {
   display: flex;
   gap: 10px;

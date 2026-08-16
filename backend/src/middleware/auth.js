@@ -42,7 +42,7 @@ function requireTelegramId(req, res, next) {
 
   if (verifiedUser && validateTelegramId(verifiedUser.id)) {
     req.telegramId = Number(verifiedUser.id);
-    req.telegramUsername = verifiedUser.username || null;
+    req.telegramUsername = verifiedUser.username || verifiedUser.first_name || null;
     req.telegramFirstName = verifiedUser.first_name || null;
     req.telegramVerified = true;
     return next();
