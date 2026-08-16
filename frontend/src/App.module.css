@@ -550,7 +550,7 @@
   padding: 10px;
   /* background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000); */
   /* background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #0093ff, #df00ff, #fff700, #7a00ff, #ff00c8, #ff0000); */
-  background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #ffdb00, #df00ff, #fff700, #ff8d00, #ff2f00, #ffe200);
+  background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #ffdb00, #000000, #fff700, #ff8d00, #ff2f00, #ffe200);
   background-size: 400% 400%;
   filter: blur(0.5px);
   animation: glowing 16s linear infinite;
@@ -748,6 +748,15 @@
   overflow: hidden;
   background: transparent;
 }
+
+.previewCard .cardInfo{
+  font-size: 14px !important;
+  margin-top: 10px;
+  margin-bottom: 5px;
+      font-family: monospace !important;
+}
+
+
 .previewModalImage {
   height: 220px;
   background-size: cover;

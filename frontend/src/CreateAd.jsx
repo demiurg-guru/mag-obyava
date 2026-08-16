@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import styles from './CreateAd.module.css';
 
 const categories = ['Транспорт','Послуги','Робота','Нерухомість','Товари інше','Будівництво','Сільгосп','Електроніка','Меблі','Одяг/Взуття'];
-const locations = ['Магдалинівка','Спаське','Підгороднє','Котовка'];
+const locations = ['Магдалинівка','Спаське','Підгородне','Котовка'];
 
 export default function CreateAd({ onClose, onSubmit, currentUser, telegramUser, initData }) {
   const [category, setCategory] = useState('');
@@ -175,13 +175,13 @@ export default function CreateAd({ onClose, onSubmit, currentUser, telegramUser,
         </header>
         <form onSubmit={submit} className={styles.modalBody}>
           <label>Заповніть всi обов`язковi поля</label>
-          <select value={category} onChange={(e)=>setCategory(e.target.value)}>
+          <select value={category} onChange={(e)=>setCategory(e.target.value)} required>
             <option value="" disabled>Оберіть категорію</option>
             {categories.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
 
           {/* <label>Оберіть локацію</label> */}
-          <select value={location} onChange={(e)=>setLocation(e.target.value)}>
+          <select value={location} onChange={(e)=>setLocation(e.target.value)} required>
             <option value="" disabled>Оберіть населенний пункт</option>
             {locations.map(l => <option key={l} value={l}>{l}</option>)}
             <option value="other">Інше (ввести вручну)</option>
@@ -191,12 +191,13 @@ export default function CreateAd({ onClose, onSubmit, currentUser, telegramUser,
               value={customLocation}
               onChange={(e) => setCustomLocation(e.target.value)}
               placeholder="Введіть свій населений пункт"
+              required
             />
           )}
 
           <label>Опис оголошення</label>
           <div style={{ position: 'relative' }}>
-            <textarea value={description} onChange={(e)=>setDescription(e.target.value)} maxLength={666} />
+            <textarea value={description} onChange={(e)=>setDescription(e.target.value)} maxLength={666} required />
             {description.length > 0 && (
               <div className={styles.charCounter}>Залишилось {666 - (description.length || 0)} символів.</div>
             )}
@@ -233,7 +234,10 @@ export default function CreateAd({ onClose, onSubmit, currentUser, telegramUser,
                   maxLength={15}
                   className={styles.manualContactInput}
                   value={manualContact}
-                  onChange={(e) => setManualContact(e.target.value.replace(/\D/g, '').slice(0, 15))}
+                  onChange={(e) => {
+                    const digitOnly = e.target.value.replace(/\D/g, '').slice(0, 15);
+                    setManualContact(digitOnly);
+                  }}
                   placeholder="введи номер телефону"
                   style={{
                     flex: 1,
@@ -249,7 +253,34 @@ export default function CreateAd({ onClose, onSubmit, currentUser, telegramUser,
             </div>
           ) : (
             <div>
-              <label>Контакт для зв'язку</label>
+              <label style={{ marginBottom: 6, display: 'block' }}>Контакт для зв'язку</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <input
+                  type="tel"
+                  inputMode="numeric"
+                  pattern="\d*"
+                  maxLength={15}
+                  value={manualContact}
+                  onChange={(e) => {
+                    const digitOnly = e.target.value.replace(/\D/g, '').slice(0, 15);
+                    setManualContact(digitOnly);
+                  }}
+                  placeholder="Введіть номер телефону"
+                  required
+                  style={{
+                    width: '200px',
+                    padding: '10px 12px',
+                    borderRadius: 12,
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    background: 'rgb(18 18 18 / 24%)',
+                    color: '#e6f7fb',
+                    fontSize: 13
+                  }}
+                />
+                <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', whiteSpace: 'nowrap' }}>
+                  TG: {telegramUser?.username ? telegramUser.username.replace(/^@/, '') : (currentUser?.username ? currentUser.username.replace(/^@/, '') : 'noname')}
+                </span>
+              </div>
             </div>
           )}
 

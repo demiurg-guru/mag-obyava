@@ -130,7 +130,7 @@ function getContactLink(contact) {
     return `https://t.me/${username}`;
   }
   if (/^\+?\d[\d\s()-]{4,}$/.test(trimmed)) {
-    return `tel:${trimmed.replace(/[^+\d]/g, '')}`;
+    return `tel:${trimmed.replace(/[^+\d]/g, '').replace(/^\+/, '')}`;
   }
   try {
     const url = new URL(trimmed);
@@ -164,7 +164,7 @@ function parseContactInfo(contact) {
   if (phoneMatch?.[1]) {
     const cleaned = phoneMatch[1].replace(/[^+\d]/g, '');
     if (/^\+?\d{7,15}$/.test(cleaned)) {
-      result.phone = `tel:${cleaned}`;
+      result.phone = `tel:${cleaned.replace(/^\+/, '')}`;
     }
   }
 
@@ -172,7 +172,7 @@ function parseContactInfo(contact) {
   if (!result.phone) {
     const onlyDigits = trimmed.replace(/[^+\d]/g, '');
     if (/^\+?\d{7,15}$/.test(onlyDigits)) {
-      result.phone = `tel:${onlyDigits}`;
+      result.phone = `tel:${onlyDigits.replace(/^\+/, '')}`;
     }
   }
 
@@ -587,6 +587,11 @@ export default function App() {
         }, ...prevAds]);
       }
       await loadAds();
+      
+      // Reload user info from server to get updated free_ad_used flag
+      if (currentUser?.telegram_user_id) {
+        await loadCurrentUserInfo(effectiveUser);
+      }
 
       setStatusMessage({
         type: 'success',
@@ -749,7 +754,7 @@ export default function App() {
                 <div className={styles.cardBody}>
                   <div className={styles.previewDescription}>{selectedAd.description}</div>
                   <div className={styles.cardInfo}>
-                    Місто: {selectedAd.location}
+                    Локацiя: {selectedAd.location}
                     <br />
                     Контакт: {selectedAd.contacts}
                   </div>
@@ -772,7 +777,7 @@ export default function App() {
                           className={`${styles.contactActionButton} ${styles.callButton}`}
                           href={contactInfo.phone}
                         >
-                          Позвонити
+                          Подзвонити
                         </a>
                       )}
                       {!telegramLink && !contactInfo.phone && (

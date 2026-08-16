@@ -14,7 +14,7 @@ const CATEGORIES = [
 const LOCATIONS = [
   'Магдалинівка',
   'Спаське',
-  'Підгороднє',
+  'Підгородне',
   'Котовка'
 ];
 
@@ -32,7 +32,10 @@ function validateCategory(category) {
 }
 
 function validateLocation(location) {
-  return typeof location === 'string' && LOCATIONS.includes(location.trim());
+  if (typeof location !== 'string') return false;
+  const trimmed = location.trim();
+  // Allow predefined locations or custom locations (1-50 characters)
+  return LOCATIONS.includes(trimmed) || (trimmed.length > 0 && trimmed.length <= 50);
 }
 
 function validateContact(contact) {
