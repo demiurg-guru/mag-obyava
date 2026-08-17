@@ -27,8 +27,13 @@
   background-blend-mode: overlay;
   overflow-y: auto;
   padding: 0px 12px 24px;
-  scrollbar-width: none;
   -ms-overflow-style: none;
+}
+
+@supports (scrollbar-width: none) {
+  .screen {
+    scrollbar-width: none;
+  }
 }
 
 @media (max-width: 480px) {
@@ -87,9 +92,22 @@
 }
 
 .headerShrink .title {
-  font-size: 18px;
+  font-size: 20px;
   margin-bottom: 6px;
 }
+
+.headerShrink .searchButton,
+.headerShrink .btnAdd {
+  min-height: 24px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  transition: min-height 0.25s ease;
+}
+
+.headerShrink .headerInfo {
+  font-size: 12px;
+}
+
 
 @property --c1 {
   syntax: '<color>';
@@ -130,7 +148,7 @@
   color: transparent;
   -webkit-text-fill-color: transparent;
   animation: titleGlow 6s ease-in-out infinite;
-  margin-bottom: 10px;
+  margin-bottom: 0;
 }
 
 @keyframes titleGlow {
@@ -141,12 +159,31 @@
   100% { --c1: #ff1eba; --c2: #f3d24b; --c3: #4dc997; --c4: #6ccfff; }
 }
 
+.subtitle {
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 1px;
+  font-size: clamp(10px, 2vw, 12px);
+  font-weight: 400;
+  letter-spacing: 0.3px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0;
+  margin-top: -10px;
+  transition: font-size 0.25s ease, margin-bottom 0.25s ease;
+}
+
+.headerShrink .subtitle {
+  font-size: 9px;
+  margin-bottom: 0;
+}
+
 .topRow {
   display: flex;
   align-items: center;
   justify-content: space-around;
   gap: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 2px;
+  margin-top: 6px;
 }
 
 .headerInfo {
@@ -186,11 +223,11 @@
   color: #fff;
   border: none;
   border-radius: 16px;
-  padding: 8px 24px;
+  padding: 8px 40px;
   /* font-family: 'Segoe UI', Arial, sans-serif; */
   font-size: 16px;
   font-weight: 600;
-  line-height: 1.4;
+  /* line-height: 1.4; */
   white-space: nowrap;
   cursor: pointer;
   min-height: 40px;
@@ -198,7 +235,7 @@
   transition: box-shadow .2s ease;
 }
 .searchButton:hover {
-   box-shadow: inset 0 5px 8px rgb(105 105 105 / 83%), 0 10px 24px rgba(3, 33, 36, 0.22), 0 2px 6px rgba(3, 33, 36, 0.12);
+  box-shadow: inset 0 5px 8px rgb(105 105 105 / 83%), 0 10px 24px rgba(3, 33, 36, 0.22), 0 2px 6px rgba(3, 33, 36, 0.12);
   transition: box-shadow .12s ease;
 }
 .searchButton:active { transform: translateY(0); }
@@ -258,40 +295,38 @@
 .categoriesWrap {
   position: relative;
   width: 100%;
+  /* max-width: 300px; */
+    overflow: hidden;
 }
-
-@media (min-width: 320px) {
-  .categoriesWrap {
-    max-width: 320px;
+@media (min-width: 900px) {
+  .categoriesStrip {
+    max-width: 900px;
   }
 }
 
-@media (min-width: 420px) {
-  .categoriesWrap {
-    max-width: 420px;
-  }
-}
-
-@media (max-width: 640px) {
-  .categoriesWrap {
-    max-width: 640px;
+@media (max-width: 1024px) {
+  .categoriesStrip {
+    max-width: 900px;
   }
 }
 
 @media (max-width: 780px) {
-  .categoriesWrap {
-    max-width: 780px;
+  .categoriesStrip {
+    max-width: 500px;
   }
 }
 
+@media (max-width: 640px) {
+  .categoriesStrip {
+    max-width: 540px;
+  }
+}
 
-
-
-
-
-
-
-
+@media (max-width: 440px) {
+  .categoriesStrip {
+    max-width: 380px;
+  }
+}
 
 
 .categoriesStrip {
@@ -361,6 +396,8 @@
 .customScrollbarThumb:active { cursor: grabbing; }
 
 .searchPanel {
+  position: relative;
+  padding: 5px;
   background: rgba(0, 0, 0, .4);
   font-family: 'Segoe UI', Arial, sans-serif;
   font-size: 16px;
@@ -377,7 +414,7 @@
 
 @media (min-width: 900px) {
   .searchPanel {
-    max-width: 50%;
+    /* max-width: 50%; */
   }
 }
 
@@ -469,6 +506,7 @@
 }
 
 .promoCard {
+  font-size: 16px;
   width: min(380px, 100%);
   display: flex;
   flex-direction: column;
@@ -493,7 +531,7 @@
   flex: 1;
   min-height: 44px;
   border-radius: 18px;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .promoActions .primaryButton {
@@ -502,7 +540,7 @@
   /* box-shadow: 0 10px 20px rgba(0,0,0,0.18); */
   box-shadow: inset 0 0px 13px rgba(0, 0, 0, 0.28), 0 0px 10px rgba(0,0,0,0.22);
   text-wrap: wrap;
-    padding: 0 8px;
+    padding: 4px 8px;
     border: none;
     transition: all 0.92s ease-in-out;
 }
@@ -517,7 +555,7 @@
   color: #f2f7ff;
   /* border: 1px solid rgba(255,255,255,0.22); */
   box-shadow: inset 0 1px 10px rgba(0,0,0,0.32), 0 0px 10px rgba(0,0,0,0.22);
-  font-size: 14px;
+  font-size: 16px;
   border:none;
   transition: all 0.32s ease-in-out;
 }
@@ -686,11 +724,6 @@
   }
 }
 
-@media (min-width: 768px) {
-  .cardInfo {
-    font-size: 15px !important;
-  }
-}
 
 .status {
   margin: 0 0 8px;

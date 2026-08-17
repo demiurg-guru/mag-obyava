@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
-const { port, publicOrigin } = require('./config');
+const { port, publicOrigin, telegramBotToken, telegramChannelId } = require('./config');
 const adsRoutes = require('./routes/ads');
 const healthRoutes = require('./routes/health');
 const meRoutes = require('./routes/me');
@@ -55,6 +55,11 @@ app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`Mag Obyava backend listening on port ${port}`);
+  if (telegramBotToken && telegramChannelId) {
+    console.log('✓ Telegram integration enabled');
+  } else {
+    console.warn('⚠ Telegram integration disabled (missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHANNEL_ID)');
+  }
 });
 
 startCronjob();

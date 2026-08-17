@@ -4,6 +4,20 @@ import styles from './CreateAd.module.css';
 const categories = ['Транспорт','Послуги','Робота','Нерухомість','Товари інше','Будівництво','Сільгосп','Електроніка','Меблі','Одяг/Взуття'];
 const locations = ['Магдалинівка','Спаське','Підгородне','Котовка'];
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+
+function parseTelegramInitDataUser(initData) {
+  if (!initData || typeof initData !== 'string') return null;
+  try {
+    const params = new URLSearchParams(initData);
+    const rawUser = params.get('user');
+    if (!rawUser) return null;
+    const parsed = JSON.parse(rawUser);
+    return parsed?.id ? parsed : null;
+  } catch {
+    return null;
+  }
+}
 
 export default function CreateAd({ onClose, onSubmit, currentUser, telegramUser, initData }) {
   const [category, setCategory] = useState('');
@@ -58,7 +72,7 @@ export default function CreateAd({ onClose, onSubmit, currentUser, telegramUser,
     setShareContactSupported(shareSupported);
 
     try {
-      const res = await fetch('/api/me', { headers });
+      const res = await fetch(`${API_BASE}/api/me`, { headers });
       const data = await res.json().catch(() => null);
       const user = data?.user;
       const phone = user?.phone || currentUser?.phone || '';
@@ -124,13 +138,34 @@ export default function CreateAd({ onClose, onSubmit, currentUser, telegramUser,
   }, [currentUser?.telegram_user_id]);
 
   function getDisplayName() {
-    const direct = currentUser?.username || telegramUser?.username || currentUser?.first_name || telegramUser?.first_name || '';
-    return direct ? direct.replace(/^@/, '') : '';
+    // Priority: currentUser -> telegramUser -> initData -> first_name fallback
+    const direct = currentUser?.username || telegramUser?.username || currentUser?.first_name || telegramUser?.first_name;
+    if (direct) return String(direct).replace(/^@/, '');
+    
+    // Last resort: try to extract from initData directly
+    const initDataUser = parseTelegramInitDataUser(initData);
+    if (initDataUser?.username) return String(initDataUser.username).replace(/^@/, '');
+    if (initDataUser?.first_name) return String(initDataUser.first_name).replace(/^@/, '');
+    
+    return '';
   }
 
   function getDisplayTag() {
     const name = getDisplayName();
     return name ? `@${name}` : '';
+  }
+
+  function getSafeDisplayLabel() {
+    const name = getDisplayName();
+    if (name) return `@${name}`;
+    // Fallback: never show literal 'noname' or 'user', try to get first_name
+    const firstName = currentUser?.first_name || telegramUser?.first_name;
+    if (firstName) return `@${String(firstName).replace(/^@/, '')}`;
+    // Last resort: extract from initData
+    const initDataUser = parseTelegramInitDataUser(initData);
+    if (initDataUser?.first_name) return `@${String(initDataUser.first_name).replace(/^@/, '')}`;
+    if (initDataUser?.username) return `@${String(initDataUser.username).replace(/^@/, '')}`;
+    return '@user';
   }
 
   function submit(e) {
@@ -197,12 +232,40 @@ export default function CreateAd({ onClose, onSubmit, currentUser, telegramUser,
 
   const resolvedDisplayName = getDisplayName();
   const resolvedDisplayTag = getDisplayTag();
+  const safeDisplayLabel = getSafeDisplayLabel();
+  
+  // If form has no username at all, fetch it from API on mount
+  const [serverUsernameLoaded, setServerUsernameLoaded] = useState(false);
+  useEffect(() => {
+    if (serverUsernameLoaded || resolvedDisplayName) return;
+    
+    // Only fetch if we have a telegram ID but no username yet
+    const initDataUser = parseTelegramInitDataUser(initData);
+    if (!initDataUser?.id) return;
+    
+    const headers = { 'x-telegram-id': String(initDataUser.id) };
+    if (initData) headers['X-Telegram-Init-Data'] = initData;
+    
+    (async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/me`, { headers });
+        const data = await res.json().catch(() => null);
+        if (data?.user?.username) {
+          // Username will be picked up by getDisplayName on next render
+        }
+      } catch (e) {
+        console.warn('Failed to preload username:', e);
+      } finally {
+        setServerUsernameLoaded(true);
+      }
+    })();
+  }, [initData, serverUsernameLoaded, resolvedDisplayName]);
 
   const contactLabel = contactStatus === 'loading'
     ? 'Завантаження контакту...'
     : (resolvedDisplayTag
       ? `${resolvedDisplayTag}${(contactStatus === 'phone' && contacts) ? ` · ${contacts}` : ''}`
-      : (contactStatus === 'phone' && contacts ? contacts : 'Контакт недоступний'));
+      : (contactStatus === 'phone' && contacts ? contacts : safeDisplayLabel));
 
   return (
     <div className={styles.modal}>
@@ -315,7 +378,7 @@ export default function CreateAd({ onClose, onSubmit, currentUser, telegramUser,
                   }}
                 />
                 <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', whiteSpace: 'nowrap' }}>
-                  TG: {resolvedDisplayName || 'noname'}
+                  TG: {resolvedDisplayTag || safeDisplayLabel}
                 </span>
               </div>
             </div>

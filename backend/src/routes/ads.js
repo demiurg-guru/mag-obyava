@@ -204,9 +204,19 @@ router.post('/', requireTelegramId, async (req, res, next) => {
 
     const adWithImage = { ...ad, img: imageUrl };
     console.log('DEBUG sendAdToChannel called with photoBuffer', !!imageBuffer, 'img', imageUrl);
-    const messageId = await sendAdToChannel(adWithImage, imageBuffer, photoFileName);
+    let messageId = 0;
+    try {
+      messageId = await sendAdToChannel(adWithImage, imageBuffer, photoFileName);
+      console.log('DEBUG Telegram message sent, messageId:', messageId);
+    } catch (telegramError) {
+      console.error('ERROR sending ad to Telegram channel:', telegramError.message);
+      messageId = 0;
+      // Don't throw - continue with ad creation even if Telegram fails
+    }
 
-    await updateAdTelegramMessageId(ad.id, messageId);
+    if (messageId) {
+      await updateAdTelegramMessageId(ad.id, messageId);
+    }
     if (freeAd) {
       await updateUserFreeAdUsed(telegramId, true);
     }
@@ -215,9 +225,9 @@ router.post('/', requireTelegramId, async (req, res, next) => {
     // A numeric chat_id (e.g. "-1001234567890") has no public link, so we
     // skip building one rather than returning a broken URL.
     const channelHandle = String(telegramChannelId || '').replace(/^@/, '');
-    const telegramLink = /^-?\d+$/.test(channelHandle)
-      ? null
-      : `https://t.me/${channelHandle}/${messageId}`;
+    const telegramLink = (messageId && /^-?\d+$/.test(channelHandle) === false)
+      ? `https://t.me/${channelHandle}/${messageId}`
+      : null;
     // fetch final ad record (with img and telegram_message_id) and return it to client
     const finalAd = await getAdById(ad.id);
     res.json({ success: true, ad: finalAd, ad_id: ad.id, telegram_link: telegramLink });

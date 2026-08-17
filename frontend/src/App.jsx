@@ -185,6 +185,21 @@ function getTelegramInitData() {
   return typeof window !== 'undefined' ? (window.Telegram?.WebApp?.initData || null) : null;
 }
 
+function parseTelegramInitDataUser(initData) {
+  if (!initData || typeof initData !== 'string') return null;
+
+  try {
+    const params = new URLSearchParams(initData);
+    const rawUser = params.get('user');
+    if (!rawUser) return null;
+    const parsed = JSON.parse(rawUser);
+    if (!parsed || !parsed.id) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
 function normalizeAd(ad) {
   if (!ad || typeof ad !== 'object') return null;
   const rawImg = ad.img || ad.photo_url || null;
@@ -269,36 +284,46 @@ export default function App() {
       return { id: mockUserId || '123456', username: mockUsername || 'mockuser' };
     }
 
-    return typeof window !== 'undefined' && window.Telegram?.WebApp?.initDataUnsafe?.user
-      ? window.Telegram.WebApp.initDataUnsafe.user
-      : getBrowserFallbackUser();
+    const initDataUser = parseTelegramInitDataUser(getTelegramInitData());
+    if (initDataUser) return initDataUser;
+    if (typeof window !== 'undefined' && window.Telegram?.WebApp?.initDataUnsafe?.user) {
+      return window.Telegram.WebApp.initDataUnsafe.user;
+    }
+    return getBrowserFallbackUser();
   }
 
   async function loadCurrentUserInfo(tgUser) {
-    if (!tgUser?.id) {
+    const initData = getTelegramInitData();
+    const initDataUser = parseTelegramInitDataUser(initData);
+    const resolvedUser = tgUser || initDataUser || null;
+    
+    if (!resolvedUser?.id) {
       setUserLoaded(true);
       return;
     }
-    const headers = { 'x-telegram-id': String(tgUser.id) };
-    const initData = getTelegramInitData();
+    
+    const headers = { 'x-telegram-id': String(resolvedUser.id) };
     if (initData) headers['X-Telegram-Init-Data'] = initData;
 
     try {
       const res = await fetch(`${API_BASE}/api/me`, { headers });
       const data = await res.json().catch(() => null);
       const serverUser = data?.user || null;
+      // Priority: initData username > server username > first_name
+      const safeUsername = resolvedUser.username || serverUser?.username || resolvedUser.first_name || null;
       setCurrentUser({
-        telegram_user_id: tgUser.id,
-        username: tgUser.username || serverUser?.username || tgUser.first_name || null,
-        first_name: tgUser.first_name || serverUser?.first_name || null,
+        telegram_user_id: resolvedUser.id,
+        username: safeUsername,
+        first_name: resolvedUser.first_name || serverUser?.first_name || null,
         phone: serverUser?.phone || null,
         free_ad_used: !!serverUser?.free_ad_used
       });
     } catch (error) {
+      console.error('loadCurrentUserInfo failed:', error);
       setCurrentUser({
-        telegram_user_id: tgUser.id,
-        username: tgUser.username || tgUser.first_name || null,
-        first_name: tgUser.first_name || null,
+        telegram_user_id: resolvedUser.id,
+        username: resolvedUser.username || resolvedUser.first_name || null,
+        first_name: resolvedUser.first_name || null,
         phone: null,
         free_ad_used: false
       });
@@ -555,10 +580,19 @@ export default function App() {
         if (value !== null && value !== undefined) fd.append(k, value);
       });
 
-      const effectiveUser = tgStatus.user || getEffectiveTelegramUser();
+      // CRITICAL: Always use fresh user data from initData, not stale state
+      const initData = getTelegramInitData();
+      const initDataUser = parseTelegramInitDataUser(initData);
+      const effectiveUser = initDataUser || getEffectiveTelegramUser();
+      
+      if (!effectiveUser?.id) {
+        throw new Error('Не вдалось визначити користувача. Спробуйте переоткрити додаток.');
+      }
+
       if (effectiveUser?.id) {
         setCurrentUser({
-          username: effectiveUser.username || null,
+          username: effectiveUser.username || effectiveUser.first_name || null,
+          first_name: effectiveUser.first_name || null,
           telegram_user_id: effectiveUser.id,
           phone: null
         });
@@ -566,8 +600,12 @@ export default function App() {
 
       const headers = {};
       if (effectiveUser?.id) headers['x-telegram-id'] = String(effectiveUser.id);
-      const initData = getTelegramInitData();
-      if (initData) headers['X-Telegram-Init-Data'] = initData;
+      // CRITICAL: Always send initData so backend can verify the user
+      if (initData) {
+        headers['X-Telegram-Init-Data'] = initData;
+      } else {
+        console.warn('WARNING: initData is missing, backend cannot verify Telegram user');
+      }
       
       const res = await fetch(`${API_BASE}/api/ads`, { method: 'POST', headers, body: fd });
       const data = await res.json().catch(() => null);
@@ -578,20 +616,20 @@ export default function App() {
       const telegramLink = data?.telegram_link || null;
 
       if (created) {
-        setAds((prevAds) => [{
-          id: String(created.id),
+        const newAd = {
+          id: `api-${created.id}`,
           category: created.category || formData.category,
           location: created.location || formData.location,
           title: created.title || formData.description || '',
           description: created.description || formData.description || '',
           contacts: created.contacts || formData.contacts || '',
           username: created.username || formData.username || null,
-          img: created.img || (formData.photo ? URL.createObjectURL(formData.photo) : 'https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=800&q=80')
-        }, ...prevAds]);
+          img: created.img || (formData.photo ? URL.createObjectURL(formData.photo) : null)
+        };
+        setAds((prevAds) => [newAd, ...prevAds]);
       }
-      await loadAds();
       
-      // Reload user info from server to get updated free_ad_used flag
+      // Only reload user info to get updated free_ad_used flag, don't reload all ads
       if (currentUser?.telegram_user_id) {
         await loadCurrentUserInfo(effectiveUser);
       }
@@ -627,6 +665,7 @@ export default function App() {
                 resetSearch();
               }
             }}>MAG_OBYAVA</div>
+            <div className={styles.subtitle}>Дошка оголошень смт Магдалинівка</div>
             <div className={styles.topRow}>
               <div className={styles.search}>
                 <button className={styles.searchButton} onClick={() => setShowSearchPanel((v) => !v)}>Пошук</button>
