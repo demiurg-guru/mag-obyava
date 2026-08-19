@@ -57,47 +57,100 @@ export default function CreateAd({ onClose, onSubmit, currentUser, telegramUser,
     setPhotoError('');
     setPhotoStatus(`Фото готове: ${sizeMb} МБ`);
   }
-
-  async function refreshContact(telegramUserId) {
-    if (!telegramUserId) {
+async function refreshContact(telegramUserId) {
+  if (!telegramUserId) {
+    setContacts('');
+    setContactStatus('missing');
+    setAskPhone(true);
+    setShareContactSupported(typeof window !== 'undefined' && typeof window.Telegram?.WebApp?.requestContact === 'function');
+    return null;
+  }
+  
+  setContactStatus('loading');
+  const headers = { 'x-telegram-id': String(telegramUserId) };
+  if (initData) headers['X-Telegram-Init-Data'] = initData;
+  
+  const shareSupported = typeof window !== 'undefined' && typeof window.Telegram?.WebApp?.requestContact === 'function';
+  setShareContactSupported(shareSupported);
+  
+  try {
+    const res = await fetch(`${API_BASE}/api/me`, { headers });
+    const data = await res.json().catch(() => null);
+    const user = data?.user;
+    const phone = user?.phone || currentUser?.phone || '';
+    const username = user?.username || currentUser?.username || '';
+    
+    if (phone) {
+      setContacts(phone);
+      setContactStatus('phone');
+      setAskPhone(false);
+      return phone;
+    } else if (username) {
+      setContacts('');
+      setContactStatus('username');
+      setAskPhone(true);
+      return null;
+    } else {
       setContacts('');
       setContactStatus('missing');
-      setShareContactSupported(typeof window !== 'undefined' && typeof window.Telegram?.WebApp?.requestContact === 'function');
-      return;
+      setAskPhone(true);
+      return null;
     }
-
-    setContactStatus('loading');
-    const headers = { 'x-telegram-id': String(telegramUserId) };
-    if (initData) headers['X-Telegram-Init-Data'] = initData;
-    const shareSupported = typeof window !== 'undefined' && typeof window.Telegram?.WebApp?.requestContact === 'function';
+  } catch (e) {
+    setContacts('');
+    setContactStatus('missing');
+    setAskPhone(true);
     setShareContactSupported(shareSupported);
+    return null;
+  }
+}
 
-    try {
-      const res = await fetch(`${API_BASE}/api/me`, { headers });
-      const data = await res.json().catch(() => null);
-      const user = data?.user;
-      const phone = user?.phone || currentUser?.phone || '';
-      const username = user?.username || currentUser?.username || '';
+function handleRequestContact() {
+  if (typeof window === 'undefined' || !window.Telegram?.WebApp?.requestContact) {
+    return;
+  }
 
-      if (phone) {
-        setContacts(phone);
-        setContactStatus('phone');
-        setAskPhone(false);
-      } else if (username) {
-        setContacts('');
-        setContactStatus('username');
-        setAskPhone(true);
-      } else {
-        setContacts('');
+  setSharingPhone(true);
+  try {
+    window.Telegram.WebApp.requestContact(async (shared) => {
+      if (!shared) {
+        setSharingPhone(false);
         setContactStatus('missing');
         setAskPhone(true);
+        return;
       }
-    } catch (e) {
-      setContacts('');
-      setContactStatus('missing');
-      setShareContactSupported(shareSupported);
-    }
+
+      setContactStatus('loading');
+      let fetchedPhone = null;
+      const maxAttempts = 6;
+
+      for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        if (attempt > 0) {
+          const delay = Math.min(1000 * attempt, 4000);
+          await new Promise((r) => setTimeout(r, delay));
+        }
+        
+        fetchedPhone = await refreshContact(currentUser?.telegram_user_id);
+        
+        if (fetchedPhone) {
+          break;
+        }
+      }
+
+      setSharingPhone(false);
+      
+      if (!fetchedPhone) {
+        setAskPhone(true);
+      }
+    });
+  } catch (error) {
+    setSharingPhone(false);
+    setContactStatus('missing');
+    setAskPhone(true);
+    console.error('requestContact failed', error);
+    alert('Не вдалося запросити номер. Спробуйте ще раз.');
   }
+}
 
   async function loadContact() {
     if (!currentUser?.telegram_user_id) {
@@ -197,39 +250,6 @@ export default function CreateAd({ onClose, onSubmit, currentUser, telegramUser,
       photo,
       is_paid: false
     });
-  }
-
-  function handleRequestContact() {
-    if (typeof window === 'undefined' || !window.Telegram?.WebApp?.requestContact) {
-      return;
-    }
-
-    setSharingPhone(true);
-    try {
-      window.Telegram.WebApp.requestContact((shared) => {
-        setSharingPhone(false);
-        if (shared?.phone_number) {
-          const digitsOnly = shared.phone_number.replace(/\D/g, '').slice(0, 15);
-          setManualContact(digitsOnly);
-          setContacts(shared.phone_number);
-          setContactStatus('phone');
-          setAskPhone(false);
-        } else if (shared) {
-          setContacts(shared.phone_number || '');
-          setContactStatus(shared.phone_number ? 'phone' : 'missing');
-          setAskPhone(!shared.phone_number);
-        } else {
-          setContactStatus('missing');
-          setAskPhone(true);
-        }
-      });
-    } catch (error) {
-      setSharingPhone(false);
-      setContactStatus('missing');
-      setAskPhone(true);
-      console.error('requestContact failed', error);
-      alert('Не вдалося запросити номер. Спробуйте ще раз.');
-    }
   }
 
   const resolvedDisplayName = getDisplayName();
