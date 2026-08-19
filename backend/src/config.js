@@ -27,6 +27,8 @@ module.exports = {
   telegramBotToken: process.env.TELEGRAM_BOT_TOKEN,
   telegramChannelId: process.env.TELEGRAM_CHANNEL_ID,
   adminTelegramId: process.env.ADMIN_TELEGRAM_ID,
+  // Internal API key for trusted services (e.g., n8n) to forward Telegram updates
+  internalApiKey: process.env.INTERNAL_API_KEY || null,
   allowAnonymous: process.env.ALLOW_ANONYMOUS === 'true',
   publicOrigin: process.env.PUBLIC_ORIGIN || '*',
   cronIntervalMs: Number(process.env.CRON_INTERVAL_MS || 24 * 60 * 60 * 1000)

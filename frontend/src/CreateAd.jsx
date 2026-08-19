@@ -165,7 +165,7 @@ export default function CreateAd({ onClose, onSubmit, currentUser, telegramUser,
     const initDataUser = parseTelegramInitDataUser(initData);
     if (initDataUser?.first_name) return `@${String(initDataUser.first_name).replace(/^@/, '')}`;
     if (initDataUser?.username) return `@${String(initDataUser.username).replace(/^@/, '')}`;
-    return '@user';
+    return 'noname';
   }
 
   function submit(e) {

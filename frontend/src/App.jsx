@@ -358,6 +358,11 @@ export default function App() {
   const screenRef = useRef(null);
   const [showPromo, setShowPromo] = useState(false);
 
+  useEffect(() => {
+    window.Telegram?.WebApp?.ready();
+    window.Telegram?.WebApp?.expand();
+  }, []);
+
   function resetSearch() {
     setSearchText('');
     setSearchQuery('');

@@ -63,6 +63,22 @@ if (!supabaseUrl || !supabaseKey) {
     return user;
   }
 
+  // Attempt to set free_ad_used atomically in the mock: if it's already true, return null
+  async function trySetUserFreeAdUsed(telegramUserId, freeAdUsed = true) {
+    let user = await getUser(telegramUserId);
+    if (!user) {
+      user = await upsertUser(telegramUserId, { free_ad_used: false });
+    }
+    if (user.free_ad_used) {
+      return null; // already used
+    }
+    user.free_ad_used = freeAdUsed;
+    user.last_action_at = new Date().toISOString();
+    users.set(telegramUserId, user);
+    persistState();
+    return user;
+  }
+
   async function updateUserFreeAdUsed(telegramUserId, freeAdUsed = true) {
     const user = await upsertUser(telegramUserId, {});
     user.free_ad_used = freeAdUsed;
@@ -163,6 +179,7 @@ if (!supabaseUrl || !supabaseKey) {
   module.exports = {
     getUser,
     upsertUser,
+    trySetUserFreeAdUsed,
     updateUserFreeAdUsed,
     updateUserLastActionAt,
     createAd,
@@ -200,6 +217,20 @@ if (!supabaseUrl || !supabaseKey) {
       .single();
     if (error) throw error;
     return data;
+  }
+
+  // Attempt to set free_ad_used = true only if it was false. Returns the updated user or null if the flag was already true.
+  async function trySetUserFreeAdUsed(telegramUserId, freeAdUsed = true) {
+    // conditional update: only update rows where free_ad_used is false
+    const { data, error } = await supabaseClient
+      .from('users')
+      .update({ free_ad_used: freeAdUsed, last_action_at: new Date().toISOString() })
+      .eq('telegram_user_id', telegramUserId)
+      .eq('free_ad_used', false)
+      .select()
+      .single();
+    if (error && error.code !== 'PGRST116') throw error; // ignore no rows matched as error
+    return data || null;
   }
 
   async function updateUserFreeAdUsed(telegramUserId, freeAdUsed = true) {
@@ -356,6 +387,7 @@ if (!supabaseUrl || !supabaseKey) {
   module.exports = {
     getUser,
     upsertUser,
+    trySetUserFreeAdUsed,
     updateUserFreeAdUsed,
     updateUserLastActionAt,
     createAd,

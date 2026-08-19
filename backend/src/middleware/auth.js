@@ -35,6 +35,21 @@ function verifyInitData(initData) {
 }
 
 function requireTelegramId(req, res, next) {
+  // Trusted internal-forwarding path (e.g., from n8n): accept username/id when a correct internal API key is present
+  const { internalApiKey } = require('../config');
+  const providedKey = req.headers['x-internal-api-key'] || null;
+  if (internalApiKey && providedKey && providedKey === internalApiKey) {
+    // try to read id and username from headers or body (webhook-like Update)
+    const id = req.headers['x-telegram-id'] || req.body?.message?.from?.id || req.body?.callback_query?.from?.id || req.body?.chat_id || null;
+    const uname = req.headers['x-telegram-username'] || req.body?.message?.from?.username || req.body?.callback_query?.from?.username || req.body?.username || null;
+    if (validateTelegramId(id)) {
+      req.telegramId = Number(id);
+      req.telegramUsername = uname ? String(uname).replace(/^@/, '') : null;
+      req.telegramVerified = true; // treat as verified because it comes from a trusted source
+      return next();
+    }
+  }
+
   // Preferred path: verified Telegram WebApp initData sent via header.
   // Frontend should call: fetch(url, { headers: { 'X-Telegram-Init-Data': tg.initData } })
   const initData = req.headers['x-telegram-init-data'];

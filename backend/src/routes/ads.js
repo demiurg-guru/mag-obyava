@@ -123,23 +123,66 @@ router.post('/', requireTelegramId, async (req, res, next) => {
     }
 
     const normalizedContact = normalizeContact(contacts || '');
-    let normalizedUsername = username ? username.replace(/^@/, '') : null;
+    // Determine username priority: body.username > contacts @xxx > trusted header > verified req.telegramUsername > webhook-like body
+    let normalizedUsername = username ? String(username).replace(/^@/, '') : null;
     if (!normalizedUsername && typeof contacts === 'string' && contacts.trim().startsWith('@')) {
       normalizedUsername = contacts.trim().replace(/^@/, '');
     }
-    const normalizedContactOrUsername = normalizeContact(contacts || username || '');
-    if (!validateContact(normalizedContactOrUsername)) {
-      return res.status(400).json({ success: false, error: 'Invalid contact information' });
+    // If a trusted internal header was provided, prefer it (safe because middleware checks key)
+    const headerUname = req.headers && (req.headers['x-telegram-username'] || req.headers['x-telegram_username']);
+    const providedKey = req.headers && (req.headers['x-internal-api-key'] || req.headers['x_internal_api_key']);
+    if (!normalizedUsername && headerUname && providedKey && providedKey === require('../config').internalApiKey) {
+      normalizedUsername = String(headerUname).replace(/^@/, '');
+    }
+    if (!normalizedUsername && req.telegramVerified && req.telegramUsername) {
+      normalizedUsername = String(req.telegramUsername).replace(/^@/, '');
+    }
+    if (!normalizedUsername && req.body) {
+      const bodyUser = (req.body.message && req.body.message.from && req.body.message.from.username)
+        || (req.body.callback_query && req.body.callback_query.from && req.body.callback_query.from.username)
+        || null;
+      if (bodyUser) normalizedUsername = String(bodyUser).replace(/^@/, '');
     }
 
+    const normalizedContactOrUsername = normalizeContact(contacts || username || normalizedUsername || '');
+    // Debug logging for validation path
+    console.log('DEBUG contact validation:', { headerUname: headerUname, providedKey: req.headers && (req.headers['x-internal-api-key'] || req.headers['x_internal_api_key']), internalKey: require('../config').internalApiKey, normalizedContactOrUsername });
+
+    // If request comes from trusted internal forwarder with header username, accept without further validation
+    const providedKeyCheck = req.headers && (req.headers['x-internal-api-key'] || req.headers['x_internal_api_key']);
+    const internalKey = require('../config').internalApiKey;
+    if (!(providedKeyCheck && providedKeyCheck === internalKey && headerUname)) {
+      if (!validateContact(normalizedContactOrUsername)) {
+        return res.status(400).json({ success: false, error: 'Invalid contact information' });
+      }
+    }
+
+    // Ensure user exists and, if we have a verified username, sync it before checking free_ad_used
     let user = await getUser(telegramId);
     if (!user) {
       user = await upsertUser(telegramId, { free_ad_used: false });
     }
 
+    if (normalizedUsername && req.telegramVerified) {
+      try {
+        await upsertUser(telegramId, { username: normalizedUsername });
+      } catch (e) {
+        console.warn('Failed to upsert username:', e && e.message);
+      }
+      user = await getUser(telegramId);
+    }
+
     const freeAd = !JSON.parse(String(is_paid).toLowerCase());
-    if (freeAd && user.free_ad_used) {
-      return res.status(403).json({ success: false, error: 'Free ad already used' });
+
+    // If this is a free ad, try to atomically reserve the free slot.
+    let freeSlotReserved = false;
+    if (freeAd) {
+      // trySetUserFreeAdUsed returns the updated user or null if already used
+      const reserved = await trySetUserFreeAdUsed(telegramId, true);
+      if (!reserved) {
+        return res.status(403).json({ success: false, error: 'Free ad already used' });
+      }
+      freeSlotReserved = true;
     }
 
     await updateUserLastActionAt(telegramId);
@@ -181,44 +224,55 @@ router.post('/', requireTelegramId, async (req, res, next) => {
       created_at: new Date().toISOString()
     };
 
-    const ad = await createAd(adPayload);
-    let imageUrl = null;
-    let photoFileName = 'photo.jpg';
-
-    if (imageData || file) {
-      if (!imageBuffer) {
-        imageBuffer = file ? file.buffer : decodeBase64Image(imageData);
-      }
-      const extension = file ? (file.originalname.split('.').pop() || 'jpg') : 'jpg';
-      photoFileName = `photo.${extension}`;
-      console.log('DEBUG imageBuffer set', !!imageBuffer, 'photoFileName', photoFileName);
-      imageUrl = await uploadPhoto({
-        telegramUserId: telegramId,
-        adId: ad.id,
-        fileName: photoFileName,
-        fileBuffer: imageBuffer
-      });
-      console.log('DEBUG uploaded image URL', imageUrl);
-      await updateAdImageUrl(ad.id, imageUrl);
-    }
-
-    const adWithImage = { ...ad, img: imageUrl };
-    console.log('DEBUG sendAdToChannel called with photoBuffer', !!imageBuffer, 'img', imageUrl);
-    let messageId = 0;
+    // Perform creation/upload/telegram-send in a protected block so we can
+    // revert the reserved free slot if something fails after reservation.
     try {
-      messageId = await sendAdToChannel(adWithImage, imageBuffer, photoFileName);
-      console.log('DEBUG Telegram message sent, messageId:', messageId);
-    } catch (telegramError) {
-      console.error('ERROR sending ad to Telegram channel:', telegramError.message);
-      messageId = 0;
-      // Don't throw - continue with ad creation even if Telegram fails
-    }
+      const ad = await createAd(adPayload);
+      let imageUrl = null;
+      let photoFileName = 'photo.jpg';
 
-    if (messageId) {
-      await updateAdTelegramMessageId(ad.id, messageId);
-    }
-    if (freeAd) {
-      await updateUserFreeAdUsed(telegramId, true);
+      if (imageData || file) {
+        if (!imageBuffer) {
+          imageBuffer = file ? file.buffer : decodeBase64Image(imageData);
+        }
+        const extension = file ? (file.originalname.split('.').pop() || 'jpg') : 'jpg';
+        photoFileName = `photo.${extension}`;
+        console.log('DEBUG imageBuffer set', !!imageBuffer, 'photoFileName', photoFileName);
+        imageUrl = await uploadPhoto({
+          telegramUserId: telegramId,
+          adId: ad.id,
+          fileName: photoFileName,
+          fileBuffer: imageBuffer
+        });
+        console.log('DEBUG uploaded image URL', imageUrl);
+        await updateAdImageUrl(ad.id, imageUrl);
+      }
+
+      const adWithImage = { ...ad, img: imageUrl };
+      console.log('DEBUG sendAdToChannel called with photoBuffer', !!imageBuffer, 'img', imageUrl);
+      let messageId = 0;
+      try {
+        messageId = await sendAdToChannel(adWithImage, imageBuffer, photoFileName);
+        console.log('DEBUG Telegram message sent, messageId:', messageId);
+      } catch (telegramError) {
+        console.error('ERROR sending ad to Telegram channel:', telegramError.message);
+        messageId = 0;
+        // Don't throw - continue with ad creation even if Telegram fails
+      }
+
+      if (messageId) {
+        await updateAdTelegramMessageId(ad.id, messageId);
+      }
+    } catch (err) {
+      // If we reserved a free slot earlier, revert it because creation failed
+      if (freeSlotReserved) {
+        try {
+          await updateUserFreeAdUsed(telegramId, false);
+        } catch (e) {
+          console.warn('Failed to revert free_ad_used after creation error:', e && e.message);
+        }
+      }
+      throw err;
     }
 
     // Public t.me links only work for channels with a public @username.
