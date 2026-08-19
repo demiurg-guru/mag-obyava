@@ -82,6 +82,7 @@ async function refreshContact(telegramUserId) {
     
     if (phone) {
       setContacts(phone);
+      setManualContact(phone);
       setContactStatus('phone');
       setAskPhone(false);
       return phone;
