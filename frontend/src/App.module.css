@@ -98,6 +98,7 @@
 
 .headerShrink .searchButton,
 .headerShrink .btnAdd {
+  font-size: 14px;
   min-height: 24px;
   padding-top: 6px;
   padding-bottom: 6px;
@@ -193,7 +194,7 @@
   /* background: rgba(255, 255, 255, 0.12); */
   background: rgb(0 206 255 / 11%);
   color: #dfe7f2;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
   letter-spacing: 0.8px;
   display: flex;
@@ -327,6 +328,20 @@
     max-width: 380px;
   }
 }
+@media (max-width: 380px) {
+  .categoriesStrip {
+    max-width: 360px;
+  }
+  .topRow {
+    flex-wrap: wrap;
+  }
+  .categoriesWrap {
+    max-width: 300px;
+    margin: auto;
+  }
+}
+
+    
 
 
 .categoriesStrip {
@@ -342,6 +357,7 @@
   touch-action: pan-x;
   scroll-behavior: smooth;
   overscroll-behavior: contain;
+          margin: auto;
 }
 .categoriesStrip::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
@@ -899,6 +915,14 @@
   line-height: 1.7;
   font-weight: 500;
   /* margin-bottom: 2px; */
+}
+.cardContact {
+  display: inline-block;
+  max-width: calc(100% - 62px);
+  vertical-align: bottom;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .previewContactButtons {
   display: flex;
