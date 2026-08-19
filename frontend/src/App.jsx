@@ -513,7 +513,7 @@ export default function App() {
   const headerInfoText = hasActiveSearch
     ? `Знайдено: ${visibleAds.length}${visibleAds.length < ads.length ? ' на сьогоднi з ' + ads.length : ''}`
     : `ТОП-${ads.length}`;
-  const headerInfoRightText = `Оголошення ${formattedDate}.`;
+  const headerInfoRightText = `Оголошення ${formattedDate}`;
 
   async function loadAds({ showSpinner = false } = {}) {
     if (showSpinner) setLoading(true);
