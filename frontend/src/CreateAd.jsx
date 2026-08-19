@@ -208,10 +208,11 @@ export default function CreateAd({ onClose, onSubmit, currentUser, telegramUser,
       window.Telegram.WebApp.requestContact((shared) => {
         setSharingPhone(false);
         if (shared?.phone_number) {
+          const digitsOnly = shared.phone_number.replace(/\D/g, '').slice(0, 15);
+          setManualContact(digitsOnly);
           setContacts(shared.phone_number);
           setContactStatus('phone');
           setAskPhone(false);
-          setManualContact('');
         } else if (shared) {
           setContacts(shared.phone_number || '');
           setContactStatus(shared.phone_number ? 'phone' : 'missing');
