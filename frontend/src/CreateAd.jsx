@@ -3,7 +3,7 @@ import styles from './CreateAd.module.css';
 
 const categories = ['Транспорт','Послуги','Робота','Нерухомість','Товари інше','Будівництво','Сільгосп','Електроніка','Меблі','Одяг/Взуття'];
 // const locations = ['Магдалинівка','Спаське','Підгородне','Котовка'];
-const locations = ['Магдалинівка', 'Приорільське', 'Олександрівка', 'Бузівка', 'Великокозирщина', 'Веселе', 'Веселий Гай', 'Виноградівка', 'Вишневе', 'Водяне', 'Гавришівка', 'Грабки', 'Гупалівка', 'Деконка', 'Дмухайлівка', 'Дубравка', 'Дудківка', 'Євдокиївка', 'Жданівка', 'Заплавка', 'Запоріжжя', 'Зоряне', 'Іванівка', 'Йосипівка', 'Казначеївка', 'Калинівка', 'Кільчень', 'Колпаківка', 'Котовка', 'Крамарка', 'Краснопілля', 'Кременівка', 'Личкове', 'Малоандріївка', "Мар'ївка", 'Минівка', 'Мусієнкове', 'Нововасилівка', 'Новоіванівка', 'Новопетрівка', 'Новоспаське', 'Оленівка', 'Очеретувате', 'Першотравенка', 'Поливанівка', 'Почино-Софіївка', 'Приют', 'Січкарівка', 'Степанівка', 'Тарасівка', 'Тарасівка', 'Тарасівка', 'Тарасо-Шевченківка', 'Топчине', 'Трудолюбівка', 'Чернеччина', 'Шевське', 'Шевченківка'];
+const locations = ['Магдалинівка', 'Приорільське', 'Олександрівка', 'Бузівка', 'Великокозирщина', 'Веселе', 'Веселий Гай', 'Виноградівка', 'Вишневе', 'Водяне', 'Гавришівка', 'Грабки', 'Гупалівка', 'Деконка', 'Дмухайлівка', 'Дубравка', 'Дудківка', 'Євдокиївка', 'Жданівка', 'Заплавка', 'Запоріжжя', 'Зоряне', 'Іванівка', 'Йосипівка', 'Казначеївка', 'Калинівка', 'Кільчень', 'Колпаківка', 'Котовка', 'Крамарка', 'Краснопілля', 'Кременівка', 'Личкове', 'Малоандріївка', "Мар'ївка", 'Минівка', 'Мусієнкове', 'Нововасилівка', 'Новоіванівка', 'Новопетрівка', 'Новоспаське', 'Оленівка', 'Очеретувате', 'Першотравенка', 'Поливанівка', 'Почино-Софіївка', 'Приют', 'Січкарівка', 'Степанівка', 'Тарасівка', 'Тарасо-Шевченківка', 'Топчине', 'Трудолюбівка', 'Чернеччина', 'Шевське', 'Шевченківка'];
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
@@ -57,8 +57,9 @@ export default function CreateAd({ onClose, onSubmit, currentUser, telegramUser,
     setPhotoError('');
     setPhotoStatus(`Фото готове: ${sizeMb} МБ`);
   }
-async function refreshContact(telegramUserId) {
-  if (!telegramUserId) {
+async function refreshContact(telegramUserId, options = {}) {
+  const effectiveId = telegramUserId || parseTelegramInitDataUser(initData)?.id;
+  if (!effectiveId) {
     setContacts('');
     setContactStatus('missing');
     setAskPhone(true);
@@ -67,7 +68,7 @@ async function refreshContact(telegramUserId) {
   }
   
   setContactStatus('loading');
-  const headers = { 'x-telegram-id': String(telegramUserId) };
+  const headers = { 'x-telegram-id': String(effectiveId) };
   if (initData) headers['X-Telegram-Init-Data'] = initData;
   
   const shareSupported = typeof window !== 'undefined' && typeof window.Telegram?.WebApp?.requestContact === 'function';
@@ -81,26 +82,31 @@ async function refreshContact(telegramUserId) {
     const username = user?.username || currentUser?.username || '';
     
     if (phone) {
+      const cleanDigits = phone.replace(/\D/g, '').slice(0, 15);
       setContacts(phone);
-      setManualContact(phone);
+      setManualContact(cleanDigits || phone);
       setContactStatus('phone');
       setAskPhone(false);
       return phone;
-    } else if (username) {
+    } else if (username && !options.expectingPhone) {
       setContacts('');
       setContactStatus('username');
       setAskPhone(true);
       return null;
     } else {
-      setContacts('');
-      setContactStatus('missing');
-      setAskPhone(true);
+      if (!options.expectingPhone) {
+        setContacts('');
+        setContactStatus('missing');
+        setAskPhone(true);
+      }
       return null;
     }
   } catch (e) {
-    setContacts('');
-    setContactStatus('missing');
-    setAskPhone(true);
+    if (!options.expectingPhone) {
+      setContacts('');
+      setContactStatus('missing');
+      setAskPhone(true);
+    }
     setShareContactSupported(shareSupported);
     return null;
   }
@@ -110,6 +116,8 @@ function handleRequestContact() {
   if (typeof window === 'undefined' || !window.Telegram?.WebApp?.requestContact) {
     return;
   }
+
+  const effectiveId = currentUser?.telegram_user_id || parseTelegramInitDataUser(initData)?.id;
 
   setSharingPhone(true);
   try {
@@ -123,15 +131,14 @@ function handleRequestContact() {
 
       setContactStatus('loading');
       let fetchedPhone = null;
-      const maxAttempts = 6;
+      const maxAttempts = 20; // 20 attempts * 500ms = 10 seconds total
 
       for (let attempt = 0; attempt < maxAttempts; attempt++) {
         if (attempt > 0) {
-          const delay = Math.min(1000 * attempt, 4000);
-          await new Promise((r) => setTimeout(r, delay));
+          await new Promise((r) => setTimeout(r, 500));
         }
         
-        fetchedPhone = await refreshContact(currentUser?.telegram_user_id);
+        fetchedPhone = await refreshContact(effectiveId, { expectingPhone: true });
         
         if (fetchedPhone) {
           break;
@@ -142,6 +149,7 @@ function handleRequestContact() {
       
       if (!fetchedPhone) {
         setAskPhone(true);
+        setContactStatus('missing');
       }
     });
   } catch (error) {

@@ -12,15 +12,21 @@ router.post('/', async (req, res) => {
     const msg = update.message;
 
     if (msg && msg.contact && msg.from) {
-      const telegramId = msg.from.id;
-      const phone = msg.contact.phone_number;
-      // Only accept a contact the user shared about themselves (not a
-      // forwarded contact card for someone else).
-      if (msg.contact.user_id === telegramId) {
-        await upsertUser(telegramId, {
-          phone,
-          username: msg.from.username || null
-        });
+      const telegramId = Number(msg.from.id);
+      const contactUserId = msg.contact.user_id ? Number(msg.contact.user_id) : null;
+      let phone = String(msg.contact.phone_number || '').trim();
+      if (phone && !phone.startsWith('+')) {
+        phone = '+' + phone;
+      }
+
+      // Accept if contactUserId matches telegramId OR if contactUserId is absent
+      if (!contactUserId || contactUserId === telegramId) {
+        if (telegramId && phone) {
+          await upsertUser(telegramId, {
+            phone,
+            username: msg.from.username || null
+          });
+        }
       }
     }
 
