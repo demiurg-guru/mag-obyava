@@ -6,7 +6,7 @@ services:
     startCommand: "cd backend && npm start"
     plan: free
     envVars:
-      - key: TELEGRAM_TOKEN
+      - key: TELEGRAM_BOT_TOKEN
         prompt: true
       - key: SUPABASE_URL
         prompt: true

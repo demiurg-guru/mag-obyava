@@ -244,11 +244,11 @@ function handleRequestContact() {
     if (!locationValue) return alert('Введіть населений пункт');
 
     const finalContact = manualContact.trim() || contacts;
+    const finalUsername = getDisplayName();
+
     if (!finalContact) {
       return alert('Будь ласка, введіть номер телефону для контакту');
     }
-
-    const finalUsername = getDisplayName();
 
     onSubmit({
       category,

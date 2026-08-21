@@ -6,6 +6,7 @@ const { validateDescription, validateCategory, validateLocation, validateContact
 const {
   getUser,
   upsertUser,
+  trySetUserFreeAdUsed,
   updateUserFreeAdUsed,
   updateUserLastActionAt,
   createAd,
