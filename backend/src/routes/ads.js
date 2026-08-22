@@ -9,6 +9,7 @@ const {
   updateUserFreeAdUsed,
   updateUserLastActionAt,
   createAd,
+  trySetUserFreeAdUsed: reserveFreeAdSlot,
   getAdsByUser,
   getAds,
   getAdById,
