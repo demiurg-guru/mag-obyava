@@ -6,6 +6,7 @@ const { validateDescription, validateCategory, validateLocation, validateContact
 const {
   getUser,
   upsertUser,
+  trySetUserFreeAdUsed,
   updateUserFreeAdUsed,
   updateUserLastActionAt,
   createAd,
@@ -146,7 +147,7 @@ router.post('/', requireTelegramId, async (req, res, next) => {
 
     const normalizedContactOrUsername = normalizeContact(contacts || username || normalizedUsername || '');
     // Debug logging for validation path
-    console.log('DEBUG contact validation:', { headerUname: headerUname, providedKey: req.headers && (req.headers['x-internal-api-key'] || req.headers['x_internal_api_key']), internalKey: require('../config').internalApiKey, normalizedContactOrUsername });
+    // console.log('DEBUG contact validation:', { headerUname: headerUname, providedKey: req.headers && (req.headers['x-internal-api-key'] || req.headers['x_internal_api_key']), internalKey: require('../config').internalApiKey, normalizedContactOrUsername });
 
     // If request comes from trusted internal forwarder with header username, accept without further validation
     const providedKeyCheck = req.headers && (req.headers['x-internal-api-key'] || req.headers['x_internal_api_key']);
@@ -226,8 +227,12 @@ router.post('/', requireTelegramId, async (req, res, next) => {
 
     // Perform creation/upload/telegram-send in a protected block so we can
     // revert the reserved free slot if something fails after reservation.
+    let ad;
+    let messageId = 0;
+
+
     try {
-      const ad = await createAd(adPayload);
+      ad = await createAd(adPayload);
       let imageUrl = null;
       let photoFileName = 'photo.jpg';
 
@@ -250,7 +255,7 @@ router.post('/', requireTelegramId, async (req, res, next) => {
 
       const adWithImage = { ...ad, img: imageUrl };
       console.log('DEBUG sendAdToChannel called with photoBuffer', !!imageBuffer, 'img', imageUrl);
-      let messageId = 0;
+      
       try {
         messageId = await sendAdToChannel(adWithImage, imageBuffer, photoFileName);
         console.log('DEBUG Telegram message sent, messageId:', messageId);

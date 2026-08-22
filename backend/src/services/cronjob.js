@@ -32,6 +32,14 @@ async function removeExpiredAds() {
       // Finally, remove ad record from DB — report if this fails
       try {
         await deleteAd(ad.id);
+        // Успешное удаление тоже репортим админу в бота, чтобы было видно,
+        // какие объявления и почему ушли из БД по крону.
+        const tariff = ad.is_paid ? 'платное, 21 день' : 'бесплатное, 5 дней';
+        await notifyAdmin(
+          `🗑 Объявление #${ad.id} удалено (просрочено, ${tariff})\n` +
+          `Категория: ${ad.category || '-'}\n` +
+          `Локація: ${ad.location || '-'}`
+        );
       } catch (err) {
         const details = err?.response?.data?.message || err?.message || String(err);
         console.error('Failed to delete ad record', ad.id, details);
