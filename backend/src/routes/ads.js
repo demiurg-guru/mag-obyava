@@ -6,7 +6,6 @@ const { validateDescription, validateCategory, validateLocation, validateContact
 const {
   getUser,
   upsertUser,
-  trySetUserFreeAdUsed,
   updateUserFreeAdUsed,
   updateUserLastActionAt,
   createAd,
@@ -178,8 +177,8 @@ router.post('/', requireTelegramId, async (req, res, next) => {
     // If this is a free ad, try to atomically reserve the free slot.
     let freeSlotReserved = false;
     if (freeAd) {
-      // trySetUserFreeAdUsed returns the updated user or null if already used
-      const reserved = await trySetUserFreeAdUsed(telegramId, true);
+      // Reserve the free slot before creating the ad.
+      const reserved = await reserveFreeAdSlot(telegramId, true);
       if (!reserved) {
         return res.status(403).json({ success: false, error: 'Free ad already used' });
       }
