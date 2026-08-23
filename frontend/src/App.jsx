@@ -363,6 +363,7 @@ export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);
   const screenRef = useRef(null);
   const [showPromo, setShowPromo] = useState(false);
+  const [promoUser, setPromoUser] = useState(null);
 
   useEffect(() => {
     window.Telegram?.WebApp?.ready();
@@ -387,8 +388,11 @@ export default function App() {
   }
 
   function getPromoTitle() {
-    const identity = getUserIdentity();
-    if (currentUser?.free_ad_used) {
+    const userForPromo = promoUser || currentUser;
+    const identity = userForPromo?.username
+      ? `@${userForPromo.username.replace(/^@/, '')}`
+      : userForPromo?.phone || userForPromo?.telegram_user_id || 'клієнт';
+    if (userForPromo?.free_ad_used) {
       return `Шановний, ${identity}, на жаль, ліміт безкоштовних оголошень вичерпано. 
         Ви можете на 14 днів розмістити платне оголошення вартістю 29 грн.
         Ваша оплата підтримує фонд допомоги домашнім тваринам, які потребують турботи.`;
@@ -403,9 +407,7 @@ export default function App() {
     }
 
     const updatedUser = await loadCurrentUserInfo(getEffectiveTelegramUser());
-    if (updatedUser) {
-      setCurrentUser(updatedUser);
-    }
+    setPromoUser(updatedUser || currentUser);
     setStatusMessage(null);
     setShowPromo(true);
   }
@@ -776,7 +778,7 @@ export default function App() {
               <div className={styles.promoCard}>
                 <div className={styles.promoText}>{getPromoTitle()}</div>
                 <div className={styles.promoActions}>
-                  {currentUser?.free_ad_used ? (
+                  {(promoUser || currentUser)?.free_ad_used ? (
                     <button className={styles.primaryButton} onClick={() => setStatusMessage({ type: 'info', text: 'Оплата наразі не налаштована.' })}>
                       Оплатити
                     </button>
