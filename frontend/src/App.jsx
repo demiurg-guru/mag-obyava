@@ -313,26 +313,22 @@ export default function App() {
       const serverUser = data?.user || null;
       // Priority: initData username > server username > first_name
       const safeUsername = resolvedUser.username || serverUser?.username || resolvedUser.first_name || null;
-      const updatedUser = {
+      setCurrentUser({
         telegram_user_id: resolvedUser.id,
         username: safeUsername,
         first_name: resolvedUser.first_name || serverUser?.first_name || null,
         phone: serverUser?.phone || null,
         free_ad_used: !!serverUser?.free_ad_used
-      };
-      setCurrentUser(updatedUser);
-      return updatedUser;
+      });
     } catch (error) {
       console.error('loadCurrentUserInfo failed:', error);
-      const fallbackUser = {
+      setCurrentUser({
         telegram_user_id: resolvedUser.id,
         username: resolvedUser.username || resolvedUser.first_name || null,
         first_name: resolvedUser.first_name || null,
         phone: null,
         free_ad_used: false
-      };
-      setCurrentUser(fallbackUser);
-      return fallbackUser;
+      });
     } finally {
       setUserLoaded(true);
     }
@@ -363,7 +359,6 @@ export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);
   const screenRef = useRef(null);
   const [showPromo, setShowPromo] = useState(false);
-  const [promoUser, setPromoUser] = useState(null);
 
   useEffect(() => {
     window.Telegram?.WebApp?.ready();
@@ -388,11 +383,8 @@ export default function App() {
   }
 
   function getPromoTitle() {
-    const userForPromo = promoUser || currentUser;
-    const identity = userForPromo?.username
-      ? `@${userForPromo.username.replace(/^@/, '')}`
-      : userForPromo?.phone || userForPromo?.telegram_user_id || 'клієнт';
-    if (userForPromo?.free_ad_used) {
+    const identity = getUserIdentity();
+    if (currentUser?.free_ad_used) {
       return `Шановний, ${identity}, на жаль, ліміт безкоштовних оголошень вичерпано. 
         Ви можете на 14 днів розмістити платне оголошення вартістю 29 грн.
         Ваша оплата підтримує фонд допомоги домашнім тваринам, які потребують турботи.`;
@@ -400,14 +392,11 @@ export default function App() {
     return `Шановний, ${identity}, ви можете розмістити одне безкоштовне оголошення на 5 днів.`;
   }
 
-  async function handleAddClick() {
+  function handleAddClick() {
     if (!userLoaded) {
       setStatusMessage({ type: 'info', text: 'Зачекайте, іде перевірка користувача...' });
       return;
     }
-
-    const updatedUser = await loadCurrentUserInfo(getEffectiveTelegramUser());
-    setPromoUser(updatedUser || currentUser);
     setStatusMessage(null);
     setShowPromo(true);
   }
@@ -629,15 +618,7 @@ export default function App() {
       
       const res = await fetch(`${API_BASE}/api/ads`, { method: 'POST', headers, body: fd });
       const data = await res.json().catch(() => null);
-      if (!res.ok) {
-        if (res.status === 403 && data?.error === 'Free ad already used') {
-          setCurrentUser((user) => user ? { ...user, free_ad_used: true } : user);
-          setStatusMessage(null);
-          setShowPromo(true);
-          return;
-        }
-        throw new Error(data?.error || 'Помилка публікації');
-      }
+      if (!res.ok) throw new Error(data?.error || 'Помилка публікації');
       
       const created = data?.ad;
       const adId = created?.id || data?.ad_id;
@@ -778,7 +759,7 @@ export default function App() {
               <div className={styles.promoCard}>
                 <div className={styles.promoText}>{getPromoTitle()}</div>
                 <div className={styles.promoActions}>
-                  {(promoUser || currentUser)?.free_ad_used ? (
+                  {currentUser?.free_ad_used ? (
                     <button className={styles.primaryButton} onClick={() => setStatusMessage({ type: 'info', text: 'Оплата наразі не налаштована.' })}>
                       Оплатити
                     </button>
