@@ -173,7 +173,12 @@ router.post('/', requireTelegramId, async (req, res, next) => {
       user = await getUser(telegramId);
     }
 
-    const freeAd = !JSON.parse(String(is_paid).toLowerCase());
+    const paidRequested = String(is_paid).toLowerCase() === 'true';
+    const freeAd = !paidRequested;
+
+    if (freeAd && user.free_ad_used) {
+      return res.status(403).json({ success: false, error: 'Free ad already used' });
+    }
 
     // If this is a free ad, try to atomically reserve the free slot.
     let freeSlotReserved = false;
