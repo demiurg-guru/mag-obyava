@@ -320,7 +320,6 @@ export default function App() {
         phone: serverUser?.phone || null,
         free_ad_used: !!serverUser?.free_ad_used
       });
-      return true;
     } catch (error) {
       console.error('loadCurrentUserInfo failed:', error);
       setCurrentUser({
@@ -330,7 +329,6 @@ export default function App() {
         phone: null,
         free_ad_used: false
       });
-      return false;
     } finally {
       setUserLoaded(true);
     }
@@ -400,12 +398,7 @@ export default function App() {
       return;
     }
 
-    const userChecked = await loadCurrentUserInfo(getEffectiveTelegramUser());
-    if (!userChecked) {
-      setStatusMessage({ type: 'error', text: 'Не вдалося перевірити користувача' });
-      return;
-    }
-
+    await loadCurrentUserInfo(getEffectiveTelegramUser());
     setStatusMessage(null);
     setShowPromo(true);
   }
@@ -627,7 +620,15 @@ export default function App() {
       
       const res = await fetch(`${API_BASE}/api/ads`, { method: 'POST', headers, body: fd });
       const data = await res.json().catch(() => null);
-      if (!res.ok) throw new Error(data?.error || 'Помилка публікації');
+      if (!res.ok) {
+        if (res.status === 403 && data?.error === 'Free ad already used') {
+          setCurrentUser((user) => user ? { ...user, free_ad_used: true } : user);
+          setStatusMessage(null);
+          setShowPromo(true);
+          return;
+        }
+        throw new Error(data?.error || 'Помилка публікації');
+      }
       
       const created = data?.ad;
       const adId = created?.id || data?.ad_id;
