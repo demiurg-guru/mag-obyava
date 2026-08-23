@@ -320,6 +320,7 @@ export default function App() {
         phone: serverUser?.phone || null,
         free_ad_used: !!serverUser?.free_ad_used
       });
+      return true;
     } catch (error) {
       console.error('loadCurrentUserInfo failed:', error);
       setCurrentUser({
@@ -329,6 +330,7 @@ export default function App() {
         phone: null,
         free_ad_used: false
       });
+      return false;
     } finally {
       setUserLoaded(true);
     }
@@ -392,11 +394,18 @@ export default function App() {
     return `Шановний, ${identity}, ви можете розмістити одне безкоштовне оголошення на 5 днів.`;
   }
 
-  function handleAddClick() {
+  async function handleAddClick() {
     if (!userLoaded) {
       setStatusMessage({ type: 'info', text: 'Зачекайте, іде перевірка користувача...' });
       return;
     }
+
+    const userChecked = await loadCurrentUserInfo(getEffectiveTelegramUser());
+    if (!userChecked) {
+      setStatusMessage({ type: 'error', text: 'Не вдалося перевірити користувача' });
+      return;
+    }
+
     setStatusMessage(null);
     setShowPromo(true);
   }
