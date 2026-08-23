@@ -313,22 +313,26 @@ export default function App() {
       const serverUser = data?.user || null;
       // Priority: initData username > server username > first_name
       const safeUsername = resolvedUser.username || serverUser?.username || resolvedUser.first_name || null;
-      setCurrentUser({
+      const updatedUser = {
         telegram_user_id: resolvedUser.id,
         username: safeUsername,
         first_name: resolvedUser.first_name || serverUser?.first_name || null,
         phone: serverUser?.phone || null,
         free_ad_used: !!serverUser?.free_ad_used
-      });
+      };
+      setCurrentUser(updatedUser);
+      return updatedUser;
     } catch (error) {
       console.error('loadCurrentUserInfo failed:', error);
-      setCurrentUser({
+      const fallbackUser = {
         telegram_user_id: resolvedUser.id,
         username: resolvedUser.username || resolvedUser.first_name || null,
         first_name: resolvedUser.first_name || null,
         phone: null,
         free_ad_used: false
-      });
+      };
+      setCurrentUser(fallbackUser);
+      return fallbackUser;
     } finally {
       setUserLoaded(true);
     }
@@ -398,7 +402,10 @@ export default function App() {
       return;
     }
 
-    await loadCurrentUserInfo(getEffectiveTelegramUser());
+    const updatedUser = await loadCurrentUserInfo(getEffectiveTelegramUser());
+    if (updatedUser) {
+      setCurrentUser(updatedUser);
+    }
     setStatusMessage(null);
     setShowPromo(true);
   }
