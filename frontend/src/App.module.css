@@ -242,7 +242,7 @@
 }
 
 .resetButtonSecondary {
-  width: 100%;
+  width: 50%;
   background: rgb(155 8 213 / 94%);
   color: #fff;
   border: 0px solid rgba(255,255,255,0.2);
@@ -428,10 +428,10 @@
   font-weight: 500;
 }
 
-.searchActions {
+/* .searchActions {
   display: flex;
   justify-content: flex-end;
-}
+} */
 
 .searchInputInline {
   border: none;
@@ -535,7 +535,7 @@
 
 .promoCard .promo-message-image {
   width: 100%;
-  max-width: 320px;
+  /* max-width: 320px; */
   height: auto;
   border-radius: 8px;
   object-fit: cover;
@@ -544,11 +544,11 @@
 }
 
 .promoCard .promo-message-motivation {
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.4;
-  color: #7f8c8d;
-  font-style: italic;
-  max-width: 300px;
+  /* color: #7f8c8d;
+  font-style: italic; */
+  /* max-width: 300px; */
 }
 
 .promoActions {
