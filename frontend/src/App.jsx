@@ -393,13 +393,13 @@ export default function App() {
       //   Ви можете на 14 днів розмістити платне оголошення вартістю 29 грн.
       //   Ваша оплата підтримує фонд допомоги домашнім тваринам, які потребують турботи.`;
       return (
-        <div className="promo-message">
-          <p className="promo-message-txt">
+        <div className={styles['promo-message']}>
+          <p className={styles['promo-message-txt']}>
             Шановний, {identity}, на жаль, ліміт безкоштовних оголошень вичерпано. 
             Ви можете на 14 днів розмістити платне оголошення вартістю 29 грн.
           </p>
-          <img src="/mag-obyava/assets/pet-fond.jpg" alt="Платне оголошення" className="promo-message-image" />
-          <p className="promo-message-motivation">
+          <img src="/mag-obyava/assets/pet-fond.jpg" alt="Платне оголошення" className={styles['promo-message-image']} />
+          <p className={styles['promo-message-motivation']}>
             Ваша оплата підтримує фонд допомоги тваринам, які потребують турботи.
           </p>
         </div>
@@ -407,9 +407,9 @@ export default function App() {
     }
     // return `Шановний, ${identity}, ви можете розмістити одне безкоштовне оголошення на 5 днів.`;
     return (
-      <div className="promo-message">
+      <div className={styles['promo-message']}>
         {/* <img src="/assets/app-bg.jpg" alt="Безкоштовне оголошення" className="promo-message-image" /> */}
-        <p className="promo-message-txt">
+        <p className={styles['promo-message-txt']}>
           Шановний, {identity}, ви можете розмістити одне безкоштовне оголошення на 5 днів.
         </p>
       </div>
