@@ -308,27 +308,27 @@ export default function App() {
     if (initData) headers['X-Telegram-Init-Data'] = initData;
 
     try {
-      const res = await fetch(`${API_BASE}/api/me`, { headers });
+      // const res = await fetch(`${API_BASE}/api/me`, { headers });
+      const res = await fetch(`${API_BASE}/api/me`, { headers, cache: 'no-store' });
+      if (!res.ok) {
+        throw new Error(`Не вдалося перевірити користувача: HTTP ${res.status}`);
+      }
       const data = await res.json().catch(() => null);
       const serverUser = data?.user || null;
       // Priority: initData username > server username > first_name
       const safeUsername = resolvedUser.username || serverUser?.username || resolvedUser.first_name || null;
-      setCurrentUser({
+      const updatedUser = {
         telegram_user_id: resolvedUser.id,
         username: safeUsername,
         first_name: resolvedUser.first_name || serverUser?.first_name || null,
         phone: serverUser?.phone || null,
         free_ad_used: !!serverUser?.free_ad_used
-      });
+      };
+      setCurrentUser(updatedUser);
+      return updatedUser;
     } catch (error) {
       console.error('loadCurrentUserInfo failed:', error);
-      setCurrentUser({
-        telegram_user_id: resolvedUser.id,
-        username: resolvedUser.username || resolvedUser.first_name || null,
-        first_name: resolvedUser.first_name || null,
-        phone: null,
-        free_ad_used: false
-      });
+      return null;
     } finally {
       setUserLoaded(true);
     }
@@ -359,6 +359,7 @@ export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);
   const screenRef = useRef(null);
   const [showPromo, setShowPromo] = useState(false);
+  const [promoUser, setPromoUser] = useState(null);
 
   useEffect(() => {
     window.Telegram?.WebApp?.ready();
@@ -383,8 +384,11 @@ export default function App() {
   }
 
   function getPromoTitle() {
-    const identity = getUserIdentity();
-    if (currentUser?.free_ad_used) {
+    const userForPromo = promoUser || currentUser;
+    const identity = userForPromo?.username
+      ? `@${userForPromo.username.replace(/^@/, '')}`
+      : userForPromo?.phone || userForPromo?.telegram_user_id || 'клієнт';
+    if (userForPromo?.free_ad_used) {
       return `Шановний, ${identity}, на жаль, ліміт безкоштовних оголошень вичерпано. 
         Ви можете на 14 днів розмістити платне оголошення вартістю 29 грн.
         Ваша оплата підтримує фонд допомоги домашнім тваринам, які потребують турботи.`;
@@ -392,11 +396,18 @@ export default function App() {
     return `Шановний, ${identity}, ви можете розмістити одне безкоштовне оголошення на 5 днів.`;
   }
 
-  function handleAddClick() {
+  async function handleAddClick() {
     if (!userLoaded) {
       setStatusMessage({ type: 'info', text: 'Зачекайте, іде перевірка користувача...' });
       return;
     }
+    setPromoUser(null);
+    const checkedUser = await loadCurrentUserInfo(getEffectiveTelegramUser());
+    if (!checkedUser) {
+      setStatusMessage({ type: 'error', text: 'Не вдалося перевірити ліміт оголошень. Спробуйте ще раз.' });
+      return;
+    }
+    setPromoUser(checkedUser);
     setStatusMessage(null);
     setShowPromo(true);
   }
@@ -603,7 +614,8 @@ export default function App() {
           username: effectiveUser.username || effectiveUser.first_name || null,
           first_name: effectiveUser.first_name || null,
           telegram_user_id: effectiveUser.id,
-          phone: null
+          phone: null,
+          free_ad_used: !formData.is_paid
         });
       }
 
@@ -759,7 +771,7 @@ export default function App() {
               <div className={styles.promoCard}>
                 <div className={styles.promoText}>{getPromoTitle()}</div>
                 <div className={styles.promoActions}>
-                  {currentUser?.free_ad_used ? (
+                  {(promoUser || currentUser)?.free_ad_used ? (
                     <button className={styles.primaryButton} onClick={() => setStatusMessage({ type: 'info', text: 'Оплата наразі не налаштована.' })}>
                       Оплатити
                     </button>

@@ -25,6 +25,7 @@ router.get('/', requireTelegramId, async (req, res, next) => {
       phone: user.phone || user.phone_number || null,
       free_ad_used: !!user.free_ad_used
     };
+    res.set('Cache-Control', 'no-store');
     res.json({ success: true, user: safe });
   } catch (err) {
     next(err);
