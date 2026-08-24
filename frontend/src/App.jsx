@@ -400,7 +400,7 @@ export default function App() {
           </p>
           <img src="/mag-obyava/assets/pet-fond.jpg" alt="Платне оголошення" className="promo-message-image" />
           <p className="promo-message-motivation">
-            Ваша оплата підтримує фонд допомоги домашнім тваринам, які потребують турботи.
+            Ваша оплата підтримує фонд допомоги тваринам, які потребують турботи.
           </p>
         </div>
       );
