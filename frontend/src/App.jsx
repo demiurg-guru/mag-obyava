@@ -27,7 +27,7 @@ const defaultAds = [
   {
     id: "3",
     category: "Електроніка",
-    location: "Підгородне",
+    location: "Підгородн",
     title: "Новий смартфон в упаковці",
     description: "Сучасний смартфон із потужним процесором та великим екраном. Повністю новий, у заводській упаковці, гарантія виробника.",
     contacts: "@username123",
@@ -389,11 +389,31 @@ export default function App() {
       ? `@${userForPromo.username.replace(/^@/, '')}`
       : userForPromo?.phone || userForPromo?.telegram_user_id || 'клієнт';
     if (userForPromo?.free_ad_used) {
-      return `Шановний, ${identity}, на жаль, ліміт безкоштовних оголошень вичерпано. 
-        Ви можете на 14 днів розмістити платне оголошення вартістю 29 грн.
-        Ваша оплата підтримує фонд допомоги домашнім тваринам, які потребують турботи.`;
+      // return `Шановний, ${identity}, на жаль, ліміт безкоштовних оголошень вичерпано. 
+      //   Ви можете на 14 днів розмістити платне оголошення вартістю 29 грн.
+      //   Ваша оплата підтримує фонд допомоги домашнім тваринам, які потребують турботи.`;
+      return (
+        <div className="promo-message">
+          <p className="promo-message-txt">
+            Шановний, {identity}, на жаль, ліміт безкоштовних оголошень вичерпано. 
+            Ви можете на 14 днів розмістити платне оголошення вартістю 29 грн.
+          </p>
+          <img src="/assets/pet-fond.jpg" alt="Платне оголошення" className="promo-message-image" />
+          <p className="promo-message-motivation">
+            Ваша оплата підтримує фонд допомоги домашнім тваринам, які потребують турботи.
+          </p>
+        </div>
+      );
     }
-    return `Шановний, ${identity}, ви можете розмістити одне безкоштовне оголошення на 5 днів.`;
+    // return `Шановний, ${identity}, ви можете розмістити одне безкоштовне оголошення на 5 днів.`;
+    return (
+      <div className="promo-message">
+        {/* <img src="/assets/app-bg.jpg" alt="Безкоштовне оголошення" className="promo-message-image" /> */}
+        <p className="promo-message-txt">
+          Шановний, {identity}, ви можете розмістити одне безкоштовне оголошення на 5 днів.
+        </p>
+      </div>
+    );
   }
 
   async function handleAddClick() {
@@ -615,7 +635,7 @@ export default function App() {
           first_name: effectiveUser.first_name || null,
           telegram_user_id: effectiveUser.id,
           phone: null,
-          free_ad_used: !formData.is_paid
+          free_ad_used: !!currentUser?.free_ad_used
         });
       }
 

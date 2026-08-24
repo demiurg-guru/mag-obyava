@@ -26,7 +26,7 @@
   background-repeat: no-repeat;
   background-blend-mode: overlay;
   overflow-y: auto;
-  padding: 0px 12px 24px;
+  padding: 0px 0 24px;
   -ms-overflow-style: none;
 }
 
@@ -38,13 +38,13 @@
 
 @media (max-width: 480px) {
   .screen {
-    padding: 0px 8px 20px;
+    padding: 0px 0 20px;
   }
 }
 
 @media (min-width: 768px) {
   .screen {
-    padding: 0px 16px 28px;
+    padding: 0px 0 28px;
   }
 }
 
@@ -65,7 +65,7 @@
   position: sticky;
   top: 0;
   z-index: 20;
-  margin: 0 -16px 24px;
+  margin: 0 0 24px;
   background-image: linear-gradient(180deg, rgba(24, 86, 95, 0.75) 0%, rgba(0, 208, 255, 0.55) 45%, rgba(54, 129, 165, 0.75) 100%), url(/assets/app-bg.jpg);
   background-size: cover;
     background-position: bottom;
@@ -81,12 +81,13 @@
 
 .headerShrink {
   padding: 4px 15px 4px;
-  margin: 0 -16px 6px;
+  margin: 0 0 6px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 0 0 18px 18px;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05), 0 12px 28px rgba(0, 0, 0, 0.18);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
+  transition: padding 0.25s ease, margin 0.25s ease, border-radius 0.25s ease, box-shadow 0.25s ease, backdrop-filter 0.25s ease;
 }
 
 .headerShrink .title {
@@ -187,7 +188,7 @@
 }
 
 .headerInfo {
-  padding: 4px 8px;
+  padding: 4px 12px;
   color: #dfe7f2;
   font-size: 12px;
   font-weight: 500;
@@ -312,6 +313,9 @@
 @media (max-width: 380px) {
   .categoriesStrip {
     max-width: 360px;
+  }
+  .btnAdd {
+    height: 28px;
   }
 }
 
@@ -448,6 +452,7 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 14px;
   width: 100%;
+  padding: 5px;
 }
 
 
@@ -455,6 +460,7 @@
   .grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 16px;
+    padding: 0 20px;
   }
 }
 
@@ -463,6 +469,7 @@
   .grid {
     grid-template-columns: repeat(4, 1fr);
     gap: 20px;
+    padding: 0 25px;
   }
 }
 
@@ -471,6 +478,7 @@
   .grid {
     grid-template-columns: repeat(5, 1fr);
     gap: 24px;
+    padding: 0 30px;
   }
 }
 
@@ -504,6 +512,43 @@
   backdrop-filter: blur(18px);
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), 0 20px 40px rgba(0,0,0,0.18);
   font-family: system-ui;
+}
+
+.promo-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 16px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin: 12px 0;
+}
+
+.promo-message-txt {
+  font-size: 15px;
+  line-height: 1.4;
+  color: #2c3e50;
+  margin-bottom: 12px;
+}
+
+.promo-message-image {
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  border-radius: 8px;
+  object-fit: cover;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.promo-message-motivation {
+  font-size: 13px;
+  line-height: 1.4;
+  color: #7f8c8d;
+  font-style: italic;
+  max-width: 300px;
 }
 
 .promoActions {
@@ -621,6 +666,7 @@
   top: 5px;
   left: 5px;
   display: flex;
+  flex-wrap: wrap;
   gap: 3px;
 }
 
@@ -722,6 +768,52 @@
 .status.success { color: #d8ffd2; }
 .status.error { color: #ffd4d4; }
 .status.info { color: #fff3d0; }
+
+.statusModalOverlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0,0,0,0.64);
+  backdrop-filter: blur(12px);
+  z-index: 100;
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 220ms ease-out;
+}
+.statusModalClosing {
+  opacity: 0;
+  pointer-events: none;
+}
+.statusModalCard {
+  position: relative;
+  width: min(320px, 100%);
+  max-width: 320px;
+  background: #18565f;
+  border-radius: 18px;
+  padding: 20px 18px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+}
+.statusModalClose {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  border: none;
+  background: rgba(255,255,255,0.95);
+  color: #1a1a1a;
+  border-radius: 999px;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+  z-index: 2;
+  font-size: 18px;
+}
 
 .previewModal {
   position: fixed;
