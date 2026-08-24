@@ -398,7 +398,7 @@ export default function App() {
             Шановний, {identity}, на жаль, ліміт безкоштовних оголошень вичерпано. 
             Ви можете на 14 днів розмістити платне оголошення вартістю 29 грн.
           </p>
-          <img src="/assets/pet-fond.jpg" alt="Платне оголошення" className="promo-message-image" />
+          <img src="/mag-obyava/assets/pet-fond.jpg" alt="Платне оголошення" className="promo-message-image" />
           <p className="promo-message-motivation">
             Ваша оплата підтримує фонд допомоги домашнім тваринам, які потребують турботи.
           </p>
