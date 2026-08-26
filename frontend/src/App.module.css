@@ -647,12 +647,11 @@
   background-color: #fbfbfc;
   background-size: cover;
   background-position: center;
-  transition: transform 0.25s ease;
-  transform-origin: center;
+  transition: background-size 0.25s ease;
 }
 
 .card:hover .cardImage {
-  transform: scale(1.08);
+  background-size: 108% 108%;
 }
 
 @media (max-width: 480px) {
