@@ -572,7 +572,7 @@
   box-shadow: inset 0 0px 13px rgba(0, 0, 0, 0.28), 0 0px 10px rgba(0,0,0,0.22);
   text-wrap: wrap;
     padding: 4px 8px;
-    font-size: 16px;
+    font-size: 15px;
     line-height: 1.2;
     font-family: inherit;
     border: none;
@@ -589,7 +589,7 @@
   color: #f2f7ff;
   /* border: 1px solid rgba(255,255,255,0.22); */
   box-shadow: inset 0 1px 10px rgba(0,0,0,0.32), 0 0px 10px rgba(0,0,0,0.22);
-  font-size: 16px;
+  font-size: 15px;
   border:none;
   transition: all 0.32s ease-in-out;
   letter-spacing: .5px;
@@ -699,7 +699,7 @@
 
 .cardBody {
   padding: 6px 8px 6px !important;
-  background: #f3f7ff !important;
+  background: #e9f0ff !important;
   border-bottom-right-radius: 61px;
 }
 
