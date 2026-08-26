@@ -410,7 +410,10 @@ export default function App() {
       <div className={styles['promo-message']}>
         {/* <img src="/assets/app-bg.jpg" alt="Безкоштовне оголошення" className="promo-message-image" /> */}
         <p className={styles['promo-message-txt']}>
-          Шановний, {identity}, ви можете розмістити одне безкоштовне оголошення на 5 днів.
+          Шановний, {identity}.
+        </p>
+         <p className={styles['promo-message-txt']}>
+          Ви можете розмістити одне безкоштовне оголошення на 5 днів.
         </p>
       </div>
     );

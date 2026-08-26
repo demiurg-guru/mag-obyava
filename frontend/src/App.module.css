@@ -495,7 +495,7 @@
   align-items: center;
   justify-content: center;
   padding: 16px;
-  background: rgba(24, 86, 95, 0.68);
+  background: rgba(0, 0, 0, 0.3);
   z-index: 40;
 }
 
@@ -592,6 +592,7 @@
   font-size: 16px;
   border:none;
   transition: all 0.32s ease-in-out;
+  letter-spacing: .5px;
 }
 
 .promoActions .resetButtonSecondary:hover {
