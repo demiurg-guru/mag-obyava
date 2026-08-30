@@ -8,111 +8,123 @@ const DEFAULT_CARD_IMAGE = `${import.meta.env.BASE_URL}assets/mag-obyava-banner.
 const defaultAds = [
   {
     id: "1",
-    category: "Транспорт",
+    category: "Послуги",
     location: "Магдалинівка",
-    title: "Терміново продам BMW M2",
-    description: "Чудовий автомобіль, один власник, повний привід, пробіг 78 000 км. У гарному стані, готовий до довгих поїздок.",
-    contacts: "@mag_obyava_bot",
-    img: "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=800&q=80"
+    title: "Англiйська мова",
+    description: "Англiйська мова",
+    contacts: "0972755230",
+    // img: "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=800&q=80"
+    img: "/mag-obyava/assets/service-5.jpg"
   },
   {
     id: "2",
-    category: "Нерухомість",
-    location: "Спаське",
-    title: "Простора 3-кімнатна квартира",
-    description: "Світла квартира на другому поверсі з ремонтом, поруч школа, дитячий майданчик та магазини. Чудовий варіант для сім’ї.",
-    contacts: "099 5453 899",
-    img: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=800&q=80"
+    category: "Послуги",
+    location: "Кам'янське",
+    title: "Отримай професiю",
+    description: "Отримай професiю",
+    contacts: "0675909029",
+    // img: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=800&q=80"
+    img: "/mag-obyava/assets/rabota-3.jpg"
   },
   {
     id: "3",
-    category: "Електроніка",
-    location: "Підгородн",
-    title: "Новий смартфон в упаковці",
-    description: "Сучасний смартфон із потужним процесором та великим екраном. Повністю новий, у заводській упаковці, гарантія виробника.",
-    contacts: "@username123",
-    img: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80"
+    category: "Послуги",
+    location: "Магдалинівка",
+    title: "Фiтнес-iнструктор",
+    description: "Фiтнес-iнструктор",
+    contacts: "0668332277",
+    // img: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80"
+    img: "/mag-obyava/assets/rabota.jpg"
   },
   {
     id: "4",
-    category: "Будівництво",
-    location: "Котовка",
-    title: "Продам будівельні матеріали",
-    description: "Якісні матеріали для ремонту та будівництва: плитка, фарба, гіпсокартон та дерево. Є доставка до об’єкта.",
-    contacts: "067 123 45 67",
-    img: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=80"
+    category: "Робота",
+    location: "Днiпро",
+    title: "Робота на заводi",
+    description: "Робота на заводi",
+    contacts: "0977214095",
+    // img: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=80"
+    img: "/mag-obyava/assets/rabota-4.jpg"
   },
   {
     id: "5",
     category: "Транспорт",
     location: "Магдалинівка",
-    title: "Вантажний фургон для бізнесу",
-    description: "Зручний фургон із великим вантажним відсіком, ідеальний для перевезення товарів та вантажів. Низьке споживання пального та комфортний салон.",
-    contacts: "095 765 43 21",
-    img: "https://images.unsplash.com/photo-1516455207990-7a41ce80f7ee?auto=format&fit=crop&w=800&q=80"
+    title: "Автострахуваня",
+    description: "Автострахування",
+    contacts: "0989163323",
+    // img: "https://images.unsplash.com/photo-1516455207990-7a41ce80f7ee?auto=format&fit=crop&w=800&q=80"
+    img: "/mag-obyava/assets/service.jpg"
   },
   {
     id: "6",
     category: "Робота",
-    location: "Спаське",
-    title: "Шукаємо кур'єра на неповний робочий день",
-    description: "Потрібен кур’єр для доставки замовлень. Графік гнучкий, робота по району, оплата погодинна та бонуси за швидкість.",
-    contacts: "@job_offers",
-    img: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80"
+    location: "Царичанка",
+    title: "Автоэлектрик",
+    description: "Автоэлектрик",
+    contacts: "0660333775",
+    // img: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80"
+    img: "/mag-obyava/assets/service-2.jpg"
   },
   {
     id: "7",
-    category: "Товари інше",
+    category: "Транспорт",
     location: "Підгороднє",
-    title: "Якісні меблі для дому",
-    description: "Шафи, комоди та столи з натурального дерева. Міцні вироби із сучасним дизайном, підходять для вітальні та спальні.",
-    contacts: "067 888 99 00",
-    img: "https://images.unsplash.com/photo-1493666438817-866a91353ca9?auto=format&fit=crop&w=800&q=80"
+    title: "Автовикуп",
+    description: "Автовикуп",
+    contacts: "0500528056",
+    // img: "https://images.unsplash.com/photo-1493666438817-866a91353ca9?auto=format&fit=crop&w=800&q=80"
+    img: "/mag-obyava/assets/service-3.jpg"
   },
   {
     id: "8",
-    category: "Сільгосп",
-    location: "Котовка",
-    title: "Насіння та добрива оптом",
-    description: "Насіння овочевих та зернових культур, а також мінеральні добрива для великих посівних площ. Доставка за домовленістю.",
-    contacts: "@agro_supply",
-    img: "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=800&q=80"
+    category: "Послуги",
+    location: "Магдалинівка",
+    title: "Таксi",
+    description: "Таксi.",
+    contacts: "0966748475",
+    // img: "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=800&q=80"
+    img: "/mag-obyava/assets/service-4.jpg"
   },
   {
     id: "9",
-    category: "Меблі",
+    category: "Сільгосп",
     location: "Магдалинівка",
-    title: "Шикарний гарнітур для вітальні",
-    description: "Повний комплект меблів для вітальні: диван, крісла, журнальний столик та шафа. Стильний дизайн, відмінний стан, практично як новий.",
-    contacts: "099 333 22 11",
-    img: "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=800&q=80"
+    title: "Кавуни",
+    description: "Кавуни. Замовляйте.",
+    contacts: "0966329117",
+    // img: "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=800&q=80"
+    img: "/mag-obyava/assets/silgosp-2.jpg"
   },
   {
     id: "10",
-    category: "Одяг/Взуття",
+    category: "Товари інше",
     location: "Спаське",
-    title: "Нова куртка та черевики",
-    description: "Стильна куртка та шкіряні черевики одного розміру. Чудовий комплект для осіннього сезону, теплий та зручний.",
-    contacts: "@style_shop",
-    img: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=800&q=80"
+    title: "Вугiлля ДГ 30-100",
+    description: "Вугiлля ДГ 30-100",
+    contacts: "0682630584",
+    // img: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=800&q=80"
+    img: "/mag-obyava/assets/tovary-inshe.jpg"
   },
   {
     id: "11",
-    category: "Послуги",
+    category: "Товари інше",
     location: "Підгороднє",
-    title: "Ремонт кухонь під ключ",
-    description: "Професійний ремонт кухонь із підбором матеріалів та встановленням меблів. Робота виконується вчасно, гарантія якості та чистота на об’єкті.",
-    contacts: "063 777 66 55",
-    img: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=800&q=80"
+    title: "Матраци на замовлення",
+    description: "Матраци",
+    contacts: "0666069609",
+    // img: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=800&q=80"
+    img: "/mag-obyava/assets/tovary-inshe-1.jpg"
   },
   {
     id: "12",
     category: "Транспорт",
-    location: "Котовка",
-    title: "Електросамокат в ідеалі",
-    description: "Сучасний електросамокат із потужним мотором та комфортною підвіскою. У чудовому стані, акумулятор тримає заряд до 30 км.",
-    contacts: "095 111 22 33",
-    img: "https://images.unsplash.com/photo-1504215680853-026ed2a45def?auto=format&fit=crop&w=800&q=80"
+    location: "Магдалинівка",
+    title: "мототранспорт",
+    description: "мототранспорт",
+    contacts: "380687805357",
+    //img: "https://images.unsplash.com/photo-1504215680853-026ed2a45def?auto=format&fit=crop&w=800&q=80"
+    img: "/mag-obyava/assets/trasport-service.jpg"
   }
 ];
 
@@ -231,7 +243,7 @@ function AdCard({ ad, index, onClick }) {
 
   return (
     <article className={styles.card} style={{ ...cardStyle, cursor: 'pointer' }} onClick={onClick}>
-      <div className={styles.cardImage} style={{ backgroundImage: `url(${imgUrl})` }}>
+      <div className={styles.cardImage} style={{ '--card-image': `url(${imgUrl})` }}>
         <div className={styles.cardTags}>
           <span className={`${styles.cardTag} ${styles.purple}`}>{categoryTag}</span>
           <span className={`${styles.cardTag} ${styles.blue}`}>{locationTag}</span>
@@ -360,6 +372,7 @@ export default function App() {
   const screenRef = useRef(null);
   const [showPromo, setShowPromo] = useState(false);
   const [promoUser, setPromoUser] = useState(null);
+  const [imgOrientation, setImgOrientation] = useState('landscape');
 
   useEffect(() => {
     window.Telegram?.WebApp?.ready();
@@ -389,9 +402,6 @@ export default function App() {
       ? `@${userForPromo.username.replace(/^@/, '')}`
       : userForPromo?.phone || userForPromo?.telegram_user_id || 'клієнт';
     if (userForPromo?.free_ad_used) {
-      // return `Шановний, ${identity}, на жаль, ліміт безкоштовних оголошень вичерпано. 
-      //   Ви можете на 14 днів розмістити платне оголошення вартістю 29 грн.
-      //   Ваша оплата підтримує фонд допомоги домашнім тваринам, які потребують турботи.`;
       return (
         <div className={styles['promo-message']}>
           <p className={styles['promo-message-txt']}>
@@ -400,7 +410,7 @@ export default function App() {
           </p>
           <img src="/mag-obyava/assets/pet-fond.jpg" alt="Платне оголошення" className={styles['promo-message-image']} />
           <p className={styles['promo-message-motivation']}>
-            Ваша оплата підтримує фонд допомоги тваринам, які потребують турботи.
+            Ваша оплата підтримує фонд допомоги тваринам, які потребують турботи
           </p>
         </div>
       );
@@ -694,6 +704,7 @@ export default function App() {
     closeTimeoutRef.current = window.setTimeout(() => {
       setSelectedAd(null);
       setIsModalClosing(false);
+      setImgOrientation('landscape');
       closeTimeoutRef.current = null;
     }, 220);
   }
@@ -789,6 +800,18 @@ export default function App() {
             ))}
           </div>
 
+          <footer className={styles.footer}>
+            <div className={styles.footerContent}>
+              <div className={styles.footerSection}>
+                <h3 className={styles.footerTitle}>MAG_OBYAVA</h3>
+                <p className={styles.footerText}>Дошка оголошень смт Магдалинівка</p>
+              </div>
+              <div className={styles.footerSection}>
+                <p className={styles.footerText}>© {new Date().getFullYear()} Усі права захищені</p>
+              </div>
+            </div>
+          </footer>
+
           {showPromo && (
             <div className={styles.promoModalOverlay}>
               <div className={styles.promoCard}>
@@ -827,6 +850,13 @@ export default function App() {
       {selectedAd && (() => {
         const contactInfo = parseContactInfo(selectedAd.contacts);
         const telegramLink = contactInfo.telegram || (selectedAd.username ? `https://t.me/${String(selectedAd.username).replace(/^@/, '')}` : null);
+        
+        const handleImageLoad = (e) => {
+          const img = e.target;
+          const orientation = img.naturalHeight > img.naturalWidth ? 'portrait' : 'landscape';
+          setImgOrientation(orientation);
+        };
+
         return (
           <div
             className={`${styles.previewModal}${isModalClosing ? ' ' + styles.previewModalClosing : ''}`}
@@ -836,7 +866,14 @@ export default function App() {
               <button className={styles.previewModalClose} onClick={closeModal} aria-label="Закрити">✕</button>
 
               <article className={`${styles.card} ${styles.previewCard}`}>
-                <div className={`${styles.cardImage} ${styles.previewModalImage}`} style={{ backgroundImage: `url(${selectedAd.img || DEFAULT_CARD_IMAGE})` }} />
+                <div className={`${styles.cardImage} ${styles.previewModalImage} ${styles[`previewModalImage_${imgOrientation}`]}`}>
+                  <img 
+                    src={selectedAd.img || DEFAULT_CARD_IMAGE} 
+                    alt={selectedAd.title}
+                    className={styles.previewImg}
+                    onLoad={handleImageLoad}
+                  />
+                </div>
                 <div className={styles.cardBody}>
                   <div className={styles.previewDescription}>{selectedAd.description}</div>
                   <div className={styles.cardInfo}>

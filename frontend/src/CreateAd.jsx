@@ -347,7 +347,7 @@ function handleRequestContact() {
                       : (contactStatus === 'phone' && contacts ? contacts : 'Контакт недоступний'))}
                 </span>
               </div>
-              {shareContactSupported && contactStatus !== 'phone' && (
+              {/* {shareContactSupported && contactStatus !== 'phone' && (
                 <button
                   type="button"
                   onClick={handleRequestContact}
@@ -355,7 +355,7 @@ function handleRequestContact() {
                 >
                   Поделиться контактом
                 </button>
-              )}
+              )} */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
                 <span style={{ fontWeight: 500, fontSize:14 }}>Контакт:</span>
                 <input
