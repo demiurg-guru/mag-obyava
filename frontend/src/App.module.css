@@ -609,6 +609,7 @@
   padding: 6px;
   background: transparent;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0px 0px 17px #fff;
 }
 
 .card:hover {
@@ -709,13 +710,19 @@
   }
 }
 
-.cardTag.blue { background: #3681a5; }
+.cardTag.blue { background: #2397cf; }
 .cardTag.purple { background: #bb0fb4; }
 
 .cardBody {
   padding: 6px 8px 6px !important;
-  background: #f3f7ff !important;
+  /* background: #f3f7ff !important; */
+      /* background: rgb(102 103 103 / 91%) !important; */
   border-bottom-right-radius: 61px;
+  color: #fff;
+  background: linear-gradient(180deg, rgba(24, 86, 95, 0.6) 0%, rgba(24, 86, 95, 0.8) 100%);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
 }
 
 @media (max-width: 480px) {
@@ -731,7 +738,7 @@
 }
 
 .cardTitle {
-  color: rgb(8 8 8 / 65%);
+  /* color: rgb(8 8 8 / 65%); */
   font-size: 14px;
   font-weight: 600;
   line-height: 1.25;
@@ -762,11 +769,14 @@
 }
 
 .cardInfo {
-  color: rgb(8 8 8 / 65%) !important;
+  /* color: rgb(8 8 8 / 65%) !important; */
   font-size: 13px !important;
   line-height: 1.4 !important;
   font-weight: 500;
   font-family: 'Segoe UI', Arial, sans-serif !important;
+  margin: auto 0 0 auto;
+  width: fit-content;
+    min-width: 150px;
 }
 
 @media (max-width: 480px) {
@@ -965,7 +975,7 @@
   min-height: auto !important;
   max-height: none !important;
   padding-right: 2px !important;
-  color: #111111 !important;
+  /* color: #111111 !important; */
   font-size: 16px !important;
   line-height: 1.5 !important;
   font-weight: 400 !important;
@@ -1029,13 +1039,7 @@
 .previewModalBody .cardInfo a:hover {
   text-decoration: underline;
 }
-.cardInfo {
-  color: #333333;
-  font-size: 14px;
-  line-height: 1.7;
-  font-weight: 500;
-  /* margin-bottom: 2px; */
-}
+
 .cardContact {
   display: inline-block;
   max-width: calc(100% - 62px);
