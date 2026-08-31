@@ -43,7 +43,6 @@ const defaultAds = [
     title: "Робота на заводi",
     description: "Робота на заводi",
     contacts: "0977214095",
-    // img: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=80"
     img: "/mag-obyava/assets/rabota-4.jpg"
   },
   {
@@ -53,7 +52,6 @@ const defaultAds = [
     title: "Автострахуваня",
     description: "Автострахування",
     contacts: "0989163323",
-    // img: "https://images.unsplash.com/photo-1516455207990-7a41ce80f7ee?auto=format&fit=crop&w=800&q=80"
     img: "/mag-obyava/assets/service.jpg"
   },
   {
@@ -63,7 +61,6 @@ const defaultAds = [
     title: "Автоэлектрик",
     description: "Автоэлектрик",
     contacts: "0660333775",
-    // img: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80"
     img: "/mag-obyava/assets/service-2.jpg"
   },
   {
@@ -73,7 +70,6 @@ const defaultAds = [
     title: "Автовикуп",
     description: "Автовикуп",
     contacts: "0500528056",
-    // img: "https://images.unsplash.com/photo-1493666438817-866a91353ca9?auto=format&fit=crop&w=800&q=80"
     img: "/mag-obyava/assets/service-3.jpg"
   },
   {
@@ -83,7 +79,6 @@ const defaultAds = [
     title: "Таксi",
     description: "Таксi.",
     contacts: "0966748475",
-    // img: "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=800&q=80"
     img: "/mag-obyava/assets/service-4.jpg"
   },
   {
@@ -93,7 +88,6 @@ const defaultAds = [
     title: "Кавуни",
     description: "Кавуни. Замовляйте.",
     contacts: "0966329117",
-    // img: "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=800&q=80"
     img: "/mag-obyava/assets/silgosp-2.jpg"
   },
   {
@@ -103,7 +97,6 @@ const defaultAds = [
     title: "Вугiлля ДГ 30-100",
     description: "Вугiлля ДГ 30-100",
     contacts: "0682630584",
-    // img: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=800&q=80"
     img: "/mag-obyava/assets/tovary-inshe.jpg"
   },
   {
@@ -111,20 +104,127 @@ const defaultAds = [
     category: "Товари інше",
     location: "Підгороднє",
     title: "Матраци на замовлення",
-    description: "Матраци",
+    description: "Матраци на замовлення",
     contacts: "0666069609",
-    // img: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=800&q=80"
     img: "/mag-obyava/assets/tovary-inshe-1.jpg"
   },
   {
     id: "12",
-    category: "Транспорт",
+    category: "Послуги",
     location: "Магдалинівка",
     title: "мототранспорт",
-    description: "мототранспорт",
+    description: "Ремонт мотоинструмента та мототранспорту",
     contacts: "380687805357",
-    //img: "https://images.unsplash.com/photo-1504215680853-026ed2a45def?auto=format&fit=crop&w=800&q=80"
     img: "/mag-obyava/assets/trasport-service.jpg"
+  
+  },
+  {
+    id: "13",
+    category: "Послуги",
+    location: "Днiпро",
+    title: "Ремонт радіаторів",
+    description: "Ремонт радіаторів",
+    contacts: "380671974288",
+    img: "/mag-obyava/assets/remont-radiatorov.jpg"
+  },
+  {
+    id: "14",
+    category: "Сільгосп",
+    location: "Самар",
+    title: "Доставка мiнеральних добрив",
+    description: "Доставка мiнеральних добрив",
+    contacts: "380677254090",
+    img: "/mag-obyava/assets/dobryva.jpg"
+  },
+  {
+    id: "15",
+    category: "Послуги",
+    location: "Магдалинівка",
+    title: "Барбершоп",
+    description: "Барбершоп",
+    contacts: "380",
+    img: "/mag-obyava/assets/service-7.jpg"
+  },
+    {
+    id: "16",
+    category: "Сільгосп",
+    location: "Самар",
+    title: "Доставка мiнеральних добрив",
+    description: "Доставка мiнеральних добрив",
+    contacts: "380677254090",
+    img: "/mag-obyava/assets/dobryva.jpg"
+  },
+  {
+    id: "17",
+    category: "Послуги",
+    location: "Днiпро",
+    title: "Автоматизацiя рутинних процесiв",
+    description: "Автоматизацiя рутинних процесiв",
+    contacts: "380",
+    img: "/mag-obyava/assets/ai.jpg"
+  },
+  {
+    id: "18",
+    category: "Послуги",
+    location: "Днiпро",
+    title: "Перетяжка карт у термовiнiл",
+    description: "Перетяжка карт у термовiнiл",
+    contacts: "380634472799",
+    img: "/mag-obyava/assets/carty.jpg"
+  },
+  {
+    id: "19",
+    category: "Послуги",
+    location: "Царичанка",
+    title: "Швидке обстеження",
+    description: "Швидке обстеження",
+    contacts: "380681962346",
+    img: "/mag-obyava/assets/obstegenya.jpg"
+  },
+  {
+    id: "20",
+    category: "Послуги",
+    location: "Царичанка",
+    title: "Купую металобрухт",
+    description: "Купую металобрухт",
+    contacts: "380958759991",
+    img: "/mag-obyava/assets/metalolom.jpg"
+  },
+  {
+    id: "21",
+    category: "Робота",
+    location: "Магдалинівка",
+    title: "Потрiбен працiвник",
+    description: "Потрiбен працiвник",
+    contacts: "380509419248",
+    img: "/mag-obyava/assets/robota-yuliya.jpg"
+  },
+  {
+    id: "22",
+    category: "Послуги",
+    location: "Украина",
+    title: "Пансiонат",
+    description: "Пансiонат",
+    contacts: "380971183997",
+    img: "/mag-obyava/assets/pancionat.jpg"
+  },
+  {
+    id: "23",
+    category: "Послуги",
+    location: "Царичанка",
+    title: "Кадастровий номер для вашої земельної дiлянки",
+    description: "Кадастровий номер для вашої земельної дiлянки",
+    contacts: "380676220993",
+    img: "/mag-obyava/assets/poslugy-kadastr.jpg"
+  },
+  {
+    id: "24",
+    category: "Робота",
+    location: "Царичанка",
+    title: "Потрiбнi робiтники на фабрику",
+    description: "Потрiбнi робiтники на фабрику",
+    contacts: "380994116051",
+    img: "/mag-obyava/assets/rabota-fabryk.jpg"
   }
 ];
 
@@ -252,13 +352,13 @@ function AdCard({ ad, index, onClick }) {
       <div className={styles.cardBody}>
         <div className={styles.cardTitle}>{cardText}</div>
         <div className={styles.cardInfo}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{display: 'inline', marginRight: '6px', verticalAlign: 'middle'}}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{display: 'inline', marginRight: '6px', verticalAlign: 'middle'}}>
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
             <circle cx="12" cy="10" r="3"></circle>
           </svg>
           {ad.location}
           <br />
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{display: 'inline', marginRight: '6px', verticalAlign: 'middle'}}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{display: 'inline', marginRight: '6px', verticalAlign: 'middle'}}>
             <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
           </svg>
           <span className={styles.cardContact}>{ad.contacts}</span>
@@ -269,7 +369,7 @@ function AdCard({ ad, index, onClick }) {
 }
 
 export default function App() {
-  const categories = ['Транспорт','Послуги','Робота','Нерухомість','Товари інше','Будівництво','Сільгосп','Електроніка','Меблі','Одяг/Взуття'];
+  const categories = ['Транспорт','Послуги','Робота','Нерухомість','Товари інше','Будівництво','Сільгосп','Електроніка','Меблі','Одяг/Взуття', 'Тварини'];
   // const locations = ['Магдалинівка','Спаське','Підгороднє','Котовка'];  
   const locations = ['Магдалинівка', 'Приорільське', 'Олександрівка', 'Бузівка', 'Великокозирщина', 'Веселе', 'Веселий Гай', 'Виноградівка', 'Вишневе', 'Водяне', 'Гавришівка', 'Грабки', 'Гупалівка', 'Деконка', 'Дмухайлівка', 'Дубравка', 'Дудківка', 'Євдокиївка', 'Жданівка', 'Заплавка', 'Запоріжжя', 'Зоряне', 'Іванівка', 'Йосипівка', 'Казначеївка', 'Калинівка', 'Кільчень', 'Колпаківка', 'Котовка', 'Крамарка', 'Краснопілля', 'Кременівка', 'Личкове', 'Малоандріївка', "Мар'ївка", 'Минівка', 'Мусієнкове', 'Нововасилівка', 'Новоіванівка', 'Новопетрівка', 'Новоспаське', 'Оленівка', 'Очеретувате', 'Першотравенка', 'Поливанівка', 'Почино-Софіївка', 'Приют', 'Січкарівка', 'Степанівка', 'Тарасівка', 'Тарасо-Шевченківка', 'Топчине', 'Трудолюбівка', 'Чернеччина', 'Шевське', 'Шевченківка'];
 
@@ -884,13 +984,13 @@ export default function App() {
                 <div className={styles.cardBody}>
                   <div className={styles.previewDescription}>{selectedAd.description}</div>
                   <div className={styles.cardInfo}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{display: 'inline', marginRight: '6px', verticalAlign: 'middle'}}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{display: 'inline', marginRight: '6px', verticalAlign: 'middle'}}>
                       <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                       <circle cx="12" cy="10" r="3"></circle>
                     </svg>
                     {selectedAd.location}
                     <br />
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{display: 'inline', marginRight: '6px', verticalAlign: 'middle'}}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{display: 'inline', marginRight: '6px', verticalAlign: 'middle'}}>
                       <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
                     </svg>
                     {selectedAd.contacts}

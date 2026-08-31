@@ -609,7 +609,9 @@
   padding: 6px;
   background: transparent;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0px 0px 17px #fff;
+  /* box-shadow: 0px 0px 17px #fff; */
+  border-bottom-right-radius: 61px;
+  border-top-right-radius: 61px;
 }
 
 .card:hover {
@@ -621,11 +623,14 @@
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: 70px;
+  /* border-radius: 70px; */
+  border-top-right-radius: 61px;
+  border-bottom-right-radius: 61px;
   padding: 10px;
   /* background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000); */
   /* background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #0093ff, #df00ff, #fff700, #7a00ff, #ff00c8, #ff0000); */
-  background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #ffdb00, #000000, #fff700, #ff8d00, #ff2f00, #ffe200);
+  /* background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #ffdb00, #000000, #fff700, #ff8d00, #ff2f00, #ffe200); */
+  background: linear-gradient(45deg, #ff0000, #ff7300, #ff012942, #ffffff, #000000, #161209, #ff8d00, #ff2f00, #06f386);
   background-size: 400% 400%;
   filter: blur(0.5px);
   animation: glowing 16s linear infinite;
@@ -885,7 +890,7 @@
 }
 .previewCard {
   width: 100%;
-  border-radius: 18px;
+  /* border-radius: 18px; */
   overflow: hidden;
   background: transparent;
 }
