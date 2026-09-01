@@ -539,7 +539,7 @@
   line-height: 1.4;
   /* color: #2c3e50; */
   margin-bottom: 12px;
-    letter-spacing: 1px;
+    letter-spacing: .5px;
 }
 
 .promoCard .promo-message-image {
@@ -557,6 +557,7 @@
     text-align: center;
     line-height: 1.4;
     letter-spacing: 1px;
+    font-weight: 600;
     text-transform: uppercase;
 }
 
@@ -726,7 +727,7 @@
 .cardTag.purple { background: #bb0fb4; }
 
 .cardBody {
-  padding: 6px 8px 6px !important;
+  padding: 6px 8px 10px !important;
   /* background: #f3f7ff !important; */
       /* background: rgb(102 103 103 / 91%) !important; */
   border-bottom-right-radius: 61px;
@@ -739,13 +740,13 @@
 
 @media (max-width: 480px) {
   .cardBody {
-    padding: 8px 10px 8px !important;
+    padding: 8px 10px 10px !important;
   }
 }
 
 @media (min-width: 768px) {
   .cardBody {
-    padding: 8px 10px 8px !important;
+    padding: 8px 10px 12px !important;
   }
 }
 
@@ -880,11 +881,11 @@
 }
 .previewModalClose {
   position: absolute;
-  top: -10px;
-  right: -10px;
+  top: -20px;
+  right: -20px;
   border: none;
-  background: rgba(255,255,255,0.95);
-  color: #1a1a1a;
+  background: #e1e1e1f2;
+  color: #020202;
   border-radius: 999px;
   width: 34px;
   height: 34px;
@@ -892,9 +893,28 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+  box-shadow: 0 5px 32px #ffffffed;
   z-index: 2;
   font-size: 18px;
+}
+.previewModalClose:before {
+  rotate: 180deg;
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 10px;
+    border-radius: 999px;
+    background: linear-gradient(45deg, red, #ff7300, #ff012942, #fff, #000, #161209, #ff8d00, #ff2f00, #06f386);
+    background-size: 400% 400%;
+    filter: blur(.5px);
+    animation: glowing 16s linear infinite;
+    animation-delay: var(--border-delay, 0s);
+    /* animation-direction: reverse; */
+    z-index: 0;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
 }
 .previewCard {
   width: 100%;

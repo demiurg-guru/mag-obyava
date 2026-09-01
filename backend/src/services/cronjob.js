@@ -1,7 +1,6 @@
 const { cronIntervalMs } = require('../config');
-const { getExpiredAds, deleteAd } = require('./supabase');
+const { getExpiredAds, deleteAd, deletePhoto, countUserAds, updateUserAdsCount, resetUserFreeAdFlag } = require('./supabase');
 const { deleteMessageFromChannel, notifyAdmin } = require('./telegram');
-const { deletePhoto } = require('./supabase');
 
 async function removeExpiredAds() {
   try {
@@ -32,12 +31,22 @@ async function removeExpiredAds() {
       // Finally, remove ad record from DB — report if this fails
       try {
         await deleteAd(ad.id);
-        // Успешное удаление тоже репортим админу в бота, чтобы было видно,
-        // какие объявления и почему ушли из БД по крону.
-        const tariff = ad.is_paid ? 'платное, 21 день' : 'бесплатное, 5 дней';
+        
+        // Обновляем счетчик объявлений юзера
+        const newCount = await countUserAds(ad.telegram_user_id);
+        await updateUserAdsCount(ad.telegram_user_id, newCount);
+        
+        // Если это было БЕСПЛАТНОЕ объявление - сбрасываем флаг
+        if (!ad.is_paid) {
+          await resetUserFreeAdFlag(ad.telegram_user_id);
+          await notifyAdmin(`✅ Юзер ${ad.telegram_user_id} может создавать новое free ad`);
+        }
+        
+        // Успешное удаление репортим админу
+        const tariff = ad.is_paid ? 'платне, 21 день' : 'безкоштовне, 5 дней';
         await notifyAdmin(
-          `🗑 Объявление #${ad.id} удалено (просрочено, ${tariff})\n` +
-          `Категория: ${ad.category || '-'}\n` +
+          `🗑 Оголошення #${ad.id} видалено (просрочено, ${tariff})\n` +
+          `Категорія: ${ad.category || '-'}\n` +
           `Локація: ${ad.location || '-'}`
         );
       } catch (err) {

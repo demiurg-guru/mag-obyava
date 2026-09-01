@@ -176,6 +176,34 @@ if (!supabaseUrl || !supabaseKey) {
     try { fs.unlinkSync(p); } catch(e){}
   }
 
+  async function countUserAds(telegramUserId) {
+    let count = 0;
+    for (const ad of ads.values()) {
+      if (ad.telegram_user_id === telegramUserId) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  async function updateUserAdsCount(telegramUserId, count) {
+    const user = users.get(telegramUserId);
+    if (user) {
+      user.ads_count = count;
+      users.set(telegramUserId, user);
+      persistState();
+    }
+  }
+
+  async function resetUserFreeAdFlag(telegramUserId) {
+    const user = users.get(telegramUserId);
+    if (user) {
+      user.free_ad_used = false;
+      users.set(telegramUserId, user);
+      persistState();
+    }
+  }
+
   module.exports = {
     getUser,
     upsertUser,
@@ -191,7 +219,10 @@ if (!supabaseUrl || !supabaseKey) {
     deleteAd,
     getExpiredAds,
     uploadPhoto,
-    deletePhoto
+    deletePhoto,
+    countUserAds,
+    updateUserAdsCount,
+    resetUserFreeAdFlag
   };
 
 } else {
@@ -384,6 +415,31 @@ if (!supabaseUrl || !supabaseKey) {
     }
   }
 
+  async function countUserAds(telegramUserId) {
+    const { count, error } = await supabaseClient
+      .from('ads')
+      .select('id', { count: 'exact', head: true })
+      .eq('telegram_user_id', telegramUserId);
+    if (error) throw error;
+    return count || 0;
+  }
+
+  async function updateUserAdsCount(telegramUserId, count) {
+    const { error } = await supabaseClient
+      .from('users')
+      .update({ ads_count: count })
+      .eq('telegram_user_id', telegramUserId);
+    if (error) throw error;
+  }
+
+  async function resetUserFreeAdFlag(telegramUserId) {
+    const { error } = await supabaseClient
+      .from('users')
+      .update({ free_ad_used: false })
+      .eq('telegram_user_id', telegramUserId);
+    if (error) throw error;
+  }
+
   module.exports = {
     getUser,
     upsertUser,
@@ -399,6 +455,9 @@ if (!supabaseUrl || !supabaseKey) {
     deleteAd,
     getExpiredAds,
     uploadPhoto,
-    deletePhoto
+    deletePhoto,
+    countUserAds,
+    updateUserAdsCount,
+    resetUserFreeAdFlag
   };
 }

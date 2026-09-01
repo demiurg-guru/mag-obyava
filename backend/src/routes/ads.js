@@ -17,7 +17,9 @@ const {
   updateAdImageUrl,
   deleteAd,
   uploadPhoto,
-  deletePhoto
+  deletePhoto,
+  countUserAds,
+  updateUserAdsCount
 } = require('../services/supabase');
 const { sendAdToChannel, deleteMessageFromChannel, notifyAdmin } = require('../services/telegram');
 
@@ -238,6 +240,11 @@ router.post('/', requireTelegramId, async (req, res, next) => {
 
     try {
       ad = await createAd(adPayload);
+      
+      // Обновляем счетчик объявлений юзера
+      const userAdsCount = await countUserAds(telegramId);
+      await updateUserAdsCount(telegramId, userAdsCount);
+      
       let imageUrl = null;
       let photoFileName = 'photo.jpg';
 
