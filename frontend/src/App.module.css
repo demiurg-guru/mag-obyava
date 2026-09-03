@@ -323,10 +323,10 @@
     font-size: 32px;
   }
   .headerMascot {
-    bottom: 2px;
-    right: 4px;
+    bottom: 0px;
+    right: -12px;
     width: 56px;
-    height: 68px;
+    height: 44px;
   }
 }
 
@@ -405,7 +405,10 @@
 .searchPanel .resetButtonSecondary {
   font-size: 16px;
   padding: 10px 14px;
+  margin-left: 15px;
+    margin-bottom: 15px;
 }
+
 
 .btnAdd {
   background: #bb0fb4;
@@ -587,7 +590,8 @@
 .searchPanel {
   position: relative;
   padding: 5px;
-  background: rgba(0, 0, 0, .4);
+  /* background: rgba(0, 0, 0, .4); */
+      background: rgb(1 75 99 / 94%);
   font-family: 'Segoe UI', Arial, sans-serif;
   font-size: 16px;
   font-weight: 600;
@@ -596,7 +600,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-top: 8px;  
+  margin-top: -9px;  
   overflow: hidden;
   animation: searchPanelReveal 220ms ease-out both;
 }
@@ -618,7 +622,7 @@
 
 .searchRow {
   cursor: pointer;
-  padding: 8px 20px;
+  padding: 8px 15px;
   font-size: 16px;
   font-weight: 500;
 }
@@ -1323,7 +1327,7 @@
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 5px;
   align-items: center;
   text-align: center;
 }
@@ -1331,7 +1335,7 @@
 .footerSection {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  /* gap: 4px; */
 }
 
 .footerTitle {
@@ -1368,7 +1372,7 @@
   }
 
   .footerText {
-    font-size: 11px;
+    font-size: 10px;
   }
 }
 
