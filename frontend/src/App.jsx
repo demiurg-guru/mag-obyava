@@ -821,13 +821,17 @@ export default function App() {
       <div className={styles.device}>
         <div className={styles.screen} ref={screenRef}>
           <div className={`${styles.header}${isScrolled ? ' ' + styles.headerShrink : ''}`}>
+            <img src="/mag-obyava/assets/makdak.png" alt="" className={styles.headerMascot} />
+            <img src="/mag-obyava/assets/makdak-1.png" alt="" className={`${styles.headerMascot} ${styles.headerMascotLeft}`} />
+          <div className={styles['block-title']}>  
             <div className={styles.title} onClick={resetSearch} role="button" tabIndex={0} onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 resetSearch();
               }
-            }}>MAG_OBYAVA</div>
+            }}>MAK_DAK</div>
             <div className={styles.subtitle}>Дошка оголошень смт Магдалинівка</div>
+          </div>    
             <div className={styles.topRow}>
               <div className={styles.search}>
                 <button className={styles.searchButton} onClick={() => setShowSearchPanel((v) => !v)}>Пошук</button>
@@ -910,7 +914,7 @@ export default function App() {
           <footer className={styles.footer}>
             <div className={styles.footerContent}>
               <div className={styles.footerSection}>
-                <h3 className={styles.footerTitle}>MAG_OBYAVA</h3>
+                <h3 className={styles.footerTitle}>MAK_DAK</h3>
                 <p className={styles.footerText}>Дошка оголошень смт Магдалинівка</p>
               </div>
               <div className={styles.footerSection}>
