@@ -28,6 +28,7 @@
   background-repeat: no-repeat;
   background-blend-mode: overlay;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 0px 0 24px;
   -ms-overflow-style: none;
 }
@@ -323,6 +324,7 @@
   }
     .title{
     font-size: 32px;
+    margin-bottom: 5px;
   }
   .headerMascot {
     bottom: 0px;

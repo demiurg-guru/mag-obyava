@@ -830,7 +830,7 @@ export default function App() {
                 resetSearch();
               }
             }}>MAK_DAK</div>
-            <div className={styles.subtitle}>Дошка оголошень смт Магдалинівка</div>
+            <div className={styles.subtitle}>Дошка оголошень Магдалинівка</div>
           </div>    
             <div className={styles.topRow}>
               <div className={styles.search}>
@@ -915,7 +915,7 @@ export default function App() {
             <div className={styles.footerContent}>
               <div className={styles.footerSection}>
                 <h3 className={styles.footerTitle}>MAK_DAK</h3>
-                <p className={styles.footerText}>Дошка оголошень смт Магдалинівка</p>
+                <p className={styles.footerText}>Дошка оголошень Магдалинівка</p>
               </div>
               <div className={styles.footerSection}>
                 <p className={styles.footerText}>© {new Date().getFullYear()} Усі права захищені</p>
