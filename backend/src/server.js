@@ -8,6 +8,7 @@ const meRoutes = require('./routes/me');
 const telegramWebhookRoutes = require('./routes/telegramWebhook');
 const errorHandler = require('./middleware/errorHandler');
 const { startCronjob } = require('./services/cronjob');
+const { verifyTelegramChannelAccess } = require('./services/telegram');
 
 const app = express();
 const upload = multer({
@@ -57,6 +58,7 @@ app.listen(port, () => {
   console.log(`Mag Obyava backend listening on port ${port}`);
   if (telegramBotToken && telegramChannelId) {
     console.log('✓ Telegram integration enabled');
+    verifyTelegramChannelAccess();
   } else {
     console.warn('⚠ Telegram integration disabled (missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHANNEL_ID)');
   }

@@ -99,10 +99,41 @@ async function deleteMessageFromChannel(messageId) {
     const description = error?.response?.data?.description || error?.message || '';
     const isIgnored = error?.response?.status === 400 && /message.*(not found|can'?t be deleted|identifier is not specified|chat not found|was deleted)/i.test(description);
     if (isIgnored) {
-      console.warn('deleteMessageFromChannel: non-fatal Telegram delete error:', description);
+      console.warn(
+        `deleteMessageFromChannel: Telegram rejected deletion (chat_id=${telegramChannelId}, message_id=${messageId}):`,
+        description
+      );
       return;
     }
     throw error;
+  }
+}
+
+async function verifyTelegramChannelAccess() {
+  if (!hasTelegram || !telegramChannelId) return;
+
+  try {
+    const meResponse = await axios.get(`${apiBase}/getMe`);
+    const botId = meResponse.data.result.id;
+    const memberResponse = await axios.get(`${apiBase}/getChatMember`, {
+      params: { chat_id: telegramChannelId, user_id: botId }
+    });
+    const member = memberResponse.data.result;
+
+    if (member.status !== 'administrator' || member.can_delete_messages !== true) {
+      console.warn(
+        'Telegram bot does not have permission to delete channel messages. ' +
+        `status=${member.status}, can_delete_messages=${member.can_delete_messages === true}`
+      );
+      return false;
+    }
+
+    console.log('✓ Telegram bot can delete channel messages');
+    return true;
+  } catch (error) {
+    const description = error?.response?.data?.description || error?.message || String(error);
+    console.warn('Could not verify Telegram channel permissions:', description);
+    return false;
   }
 }
 
@@ -126,5 +157,6 @@ async function notifyAdmin(text) {
 module.exports = {
   sendAdToChannel,
   deleteMessageFromChannel,
+  verifyTelegramChannelAccess,
   notifyAdmin
 };
