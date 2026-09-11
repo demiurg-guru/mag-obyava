@@ -1,9 +1,47 @@
 import { useEffect, useRef, useState } from 'react';
 import CreateAd from './CreateAd.jsx';
+import PaymentPage from './PaymentPage.jsx';
 import styles from './App.module.css';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 const DEFAULT_CARD_IMAGE = `${import.meta.env.BASE_URL}assets/mag-obyava-banner.jpg`;
+
+function getLocalityFromAddress(address) {
+  return address?.city || address?.town || address?.village || address?.hamlet || null;
+}
+
+async function getUkrainianLocality(city, latitude, longitude) {
+  if (typeof city === 'string' && city.trim()) {
+    const searchParams = new URLSearchParams({
+      q: city.trim(),
+      format: 'jsonv2',
+      addressdetails: '1',
+      countrycodes: 'ua',
+      'accept-language': 'uk',
+      limit: '1'
+    });
+    const searchResponse = await fetch(`https://nominatim.openstreetmap.org/search?${searchParams}`);
+    if (!searchResponse.ok) throw new Error(`Geocoding failed: HTTP ${searchResponse.status}`);
+
+    const searchResult = (await searchResponse.json())?.[0];
+    const searchedLocality = getLocalityFromAddress(searchResult?.address);
+    if (searchedLocality) return searchedLocality;
+  }
+
+  if (!Number.isFinite(Number(latitude)) || !Number.isFinite(Number(longitude))) return null;
+
+  const reverseParams = new URLSearchParams({
+    format: 'jsonv2',
+    lat: String(latitude),
+    lon: String(longitude),
+    'accept-language': 'uk',
+    zoom: '18'
+  });
+  const reverseResponse = await fetch(`https://nominatim.openstreetmap.org/reverse?${reverseParams}`);
+  if (!reverseResponse.ok) throw new Error(`Reverse geocoding failed: HTTP ${reverseResponse.status}`);
+
+  return getLocalityFromAddress((await reverseResponse.json())?.address);
+}
 
 const defaultAds = [
   {
@@ -454,6 +492,7 @@ export default function App() {
   }
 
   const [ads, setAds] = useState(defaultAds);
+  const [detectedCity, setDetectedCity] = useState('Магдалинівка');
   const [currentUser, setCurrentUser] = useState(null);
   const [userLoaded, setUserLoaded] = useState(false);
   const [tgStatus, setTgStatus] = useState({ available: false, user: null });
@@ -478,12 +517,28 @@ export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);
   const screenRef = useRef(null);
   const [showPromo, setShowPromo] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
   const [promoUser, setPromoUser] = useState(null);
   const [imgOrientation, setImgOrientation] = useState('landscape');
 
   useEffect(() => {
     window.Telegram?.WebApp?.ready();
     window.Telegram?.WebApp?.expand();
+  }, []);
+
+  useEffect(() => {
+    fetch('https://ipapi.co/json/')
+      .then((response) => {
+        if (!response.ok) throw new Error(`IP geolocation failed: HTTP ${response.status}`);
+        return response.json();
+      })
+      .then((data) => {
+        return getUkrainianLocality(data?.city, data?.latitude, data?.longitude);
+      })
+      .then((locality) => {
+        if (locality) setDetectedCity(locality);
+      })
+      .catch(() => {});
   }, []);
 
   function resetSearch() {
@@ -560,6 +615,12 @@ export default function App() {
   function handleProceedCreate() {
     setShowPromo(false);
     setShowCreate(true);
+  }
+
+  function handleOpenPayment() {
+    setShowPromo(false);
+    setShowCreate(false);
+    setShowPayment(true);
   }
 
   useEffect(() => {
@@ -817,6 +878,12 @@ export default function App() {
   }
 
   return (
+    showPayment ? (
+      <PaymentPage
+        onBack={() => setShowPayment(false)}
+        onSelect={(method) => setStatusMessage({ type: 'info', text: `Обрано: ${method.title}. Платіжний сервіс буде відкрито після підключення.` })}
+      />
+    ) : (
     <div className={styles.page}>
       <div className={styles.device}>
         <div className={styles.screen} ref={screenRef}>
@@ -830,7 +897,7 @@ export default function App() {
                 resetSearch();
               }
             }}>MAK_DAK</div>
-            <div className={styles.subtitle}>Дошка оголошень Магдалинівка</div>
+            <div className={styles.subtitle}>Дошка оголошень {detectedCity}</div>
           </div>    
             <div className={styles.topRow}>
               <div className={styles.search}>
@@ -915,7 +982,7 @@ export default function App() {
             <div className={styles.footerContent}>
               <div className={styles.footerSection}>
                 <h3 className={styles.footerTitle}>MAK_DAK</h3>
-                <p className={styles.footerText}>Дошка оголошень Магдалинівка</p>
+                <p className={styles.footerText}>Дошка оголошень {detectedCity}</p>
               </div>
               <div className={styles.footerSection}>
                 <p className={styles.footerText}>© {new Date().getFullYear()} Усі права захищені</p>
@@ -929,7 +996,7 @@ export default function App() {
                 <div className={styles.promoText}>{getPromoTitle()}</div>
                 <div className={styles.promoActions}>
                   {(promoUser || currentUser)?.free_ad_used ? (
-                    <button className={styles.primaryButton} onClick={() => setStatusMessage({ type: 'info', text: 'Оплата наразі не налаштована.' })}>
+                    <button className={styles.primaryButton} onClick={handleOpenPayment}>
                       Оплатити
                     </button>
                   ) : (
@@ -955,7 +1022,7 @@ export default function App() {
           telegramUser={tgStatus.user}
           initData={getTelegramInitData()}
           mode={currentUser?.free_ad_used ? 'paid' : 'free'}
-          onPay={() => setStatusMessage({ type: 'info', text: 'Оплата наразі не налаштована.' })}
+          onPay={handleOpenPayment}
         />
       )}
       {selectedAd && (() => {
@@ -1033,5 +1100,6 @@ export default function App() {
         );
       })()}
     </div>
+    )
   );
 }
