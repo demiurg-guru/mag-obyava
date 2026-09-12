@@ -10,6 +10,10 @@ async function removeExpiredAds() {
     }
 
     for (const ad of expiredAds) {
+      if (ad.is_favorite) {
+        continue;
+      }
+
       // Delete telegram message — non-fatal
       try {
         await deleteMessageFromChannel(ad.telegram_message_id);

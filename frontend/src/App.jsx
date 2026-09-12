@@ -51,7 +51,6 @@ const defaultAds = [
     title: "Англiйська мова",
     description: "Англiйська мова",
     contacts: "0972755230",
-    // img: "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=800&q=80"
     img: "/mag-obyava/assets/service-5.jpg"
   },
   {
@@ -61,7 +60,6 @@ const defaultAds = [
     title: "Отримай професiю",
     description: "Отримай професiю",
     contacts: "0675909029",
-    // img: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=800&q=80"
     img: "/mag-obyava/assets/rabota-3.jpg"
   },
   {
@@ -71,7 +69,6 @@ const defaultAds = [
     title: "Фiтнес-iнструктор",
     description: "Фiтнес-iнструктор",
     contacts: "0668332277",
-    // img: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80"
     img: "/mag-obyava/assets/rabota.jpg"
   },
   {
@@ -167,12 +164,12 @@ const defaultAds = [
   },
   {
     id: "14",
-    category: "Сільгосп",
-    location: "Самар",
-    title: "Доставка мiнеральних добрив",
-    description: "Доставка мiнеральних добрив",
-    contacts: "380677254090",
-    img: "/mag-obyava/assets/dobryva.jpg"
+    category: "Товари інше",
+    location: "Магдалинівка",
+    title: "Продам генратор. метан/пропан/бенз. проработал 16 моточасов. Стартер с ключа.",
+    description: "Продам генратор. метан/пропан/бенз. проработал 16 моточасов. Стартер с ключа. 4 колеса. ",
+    contacts: "380506197263",
+    img: "/mag-obyava/assets/generator-2.jpg"
   },
   {
     id: "15",
@@ -198,7 +195,7 @@ const defaultAds = [
     location: "Днiпро",
     title: "Автоматизацiя рутинних процесiв",
     description: "Автоматизацiя рутинних процесiв",
-    contacts: "380",
+    contacts: "380506197263",
     img: "/mag-obyava/assets/ai.jpg"
   },
   {

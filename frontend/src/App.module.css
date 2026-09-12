@@ -67,6 +67,7 @@
 .header {
   position: sticky;
   min-height: 100px;
+  max-height: 100px;
   top: 0;
   z-index: 20;
   margin: 0 0 24px;

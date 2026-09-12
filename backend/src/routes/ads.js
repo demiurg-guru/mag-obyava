@@ -19,7 +19,8 @@ const {
   uploadPhoto,
   deletePhoto,
   countUserAds,
-  updateUserAdsCount
+  updateUserAdsCount,
+  resetUserFreeAdFlag
 } = require('../services/supabase');
 const { sendAdToChannel, deleteMessageFromChannel, notifyAdmin } = require('../services/telegram');
 
@@ -318,10 +319,20 @@ router.delete('/:id', requireTelegramId, async (req, res, next) => {
     if (ad.telegram_user_id !== telegramId) {
       return res.status(403).json({ success: false, error: 'Not authorized to delete this ad' });
     }
+    if (ad.is_favorite) {
+      return res.status(403).json({ success: false, error: 'Favorite ads cannot be deleted' });
+    }
 
     await deleteMessageFromChannel(ad.telegram_message_id);
     await deletePhoto(ad.img);
     await deleteAd(adId);
+
+    const newCount = await countUserAds(telegramId);
+    await updateUserAdsCount(telegramId, newCount);
+
+    if (!ad.is_paid) {
+      await resetUserFreeAdFlag(telegramId);
+    }
 
     res.json({ success: true, message: 'Ad deleted' });
   } catch (error) {

@@ -97,7 +97,8 @@ async function deleteMessageFromChannel(messageId) {
     });
   } catch (error) {
     const description = error?.response?.data?.description || error?.message || '';
-    const isIgnored = error?.response?.status === 400 && /message.*(not found|can'?t be deleted|identifier is not specified|chat not found|was deleted)/i.test(description);
+    //const isIgnored = error?.response?.status === 400 && /message.*(not found|can'?t be deleted|identifier is not specified|chat not found|was deleted)/i.test(description);
+	const isIgnored = error?.response?.status === 400 && /message.*(not found|identifier is not specified|was deleted)/i.test(description);
     if (isIgnored) {
       console.warn(
         `deleteMessageFromChannel: Telegram rejected deletion (chat_id=${telegramChannelId}, message_id=${messageId}):`,
