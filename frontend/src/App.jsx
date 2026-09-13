@@ -894,7 +894,7 @@ export default function App() {
                 resetSearch();
               }
             }}>MAK_DAK</div>
-            <div className={styles.subtitle}>Дошка оголошень на зв'язку провайдера  {detectedCity}</div>
+            <div className={styles.subtitle}>Дошка оголошень вiд провайдера  {detectedCity}</div>
           </div>    
             <div className={styles.topRow}>
               <div className={styles.search}>
@@ -979,7 +979,7 @@ export default function App() {
             <div className={styles.footerContent}>
               <div className={styles.footerSection}>
                 <h3 className={styles.footerTitle}>MAK_DAK</h3>
-                <p className={styles.footerText}>Дошка оголошень на зв'язку провайдера {detectedCity}</p>
+                <p className={styles.footerText}>Дошка оголошень вiд провайдера {detectedCity}</p>
               </div>
               <div className={styles.footerSection}>
                 <p className={styles.footerText}>© {new Date().getFullYear()} Усі права захищені</p>
