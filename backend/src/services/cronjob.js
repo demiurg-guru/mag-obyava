@@ -1,5 +1,5 @@
 const { cronIntervalMs } = require('../config');
-const { getExpiredAds, deleteAd, deletePhoto, countUserAds, updateUserAdsCount, resetUserFreeAdFlag } = require('./supabase');
+const { getExpiredAds, getAds, updateAdTelegramMessageId, deleteAd, deletePhoto, countUserAds, updateUserAdsCount, resetUserFreeAdFlag } = require('./supabase');
 const { deleteMessageFromChannel, notifyAdmin } = require('./telegram');
 
 async function removeExpiredAds() {
@@ -65,10 +65,35 @@ async function removeExpiredAds() {
   }
 }
 
+async function removeChannelPosts() {
+  try {
+    const ads = await getAds({ limit: 1000 });
+    const now = Date.now();
+    for (const ad of ads) {
+      if (ad.is_paid || ad.is_favorite || !ad.telegram_message_id) continue;
+      const age = now - new Date(ad.created_at).getTime();
+      if (age < 46 * 3600000 || age >= 48 * 3600000) continue;
+      try {
+        await deleteMessageFromChannel(ad.telegram_message_id);
+        await updateAdTelegramMessageId(ad.id, null);
+      } catch (err) {
+        await notifyAdmin(`Channel delete failed, ad id=${ad.id}: ${err?.response?.data?.description || err.message}`);
+      }
+    }
+  } catch (e) {
+    await notifyAdmin(`removeChannelPosts failed: ${e.message}`);
+  }
+}
+
+async function tick() {
+  await removeChannelPosts();
+  await removeExpiredAds();
+}
+
 function startCronjob() {
   console.log(`Starting cronjob, interval=${cronIntervalMs}ms`);
-  removeExpiredAds();
-  setInterval(removeExpiredAds, cronIntervalMs);
+  tick();
+  setInterval(tick, cronIntervalMs);
 }
 
 module.exports = {
